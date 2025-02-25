@@ -4,6 +4,7 @@ import os
 from flask import Flask, request, jsonify
 from flask_login import login_user, LoginManager
 
+from data import user_resources
 from forms.login import LoginForm
 from forms.user import RegisterForm
 from flask_restful import Api
@@ -136,6 +137,13 @@ def main():
         user.degree = '15'
         db_sess.add(user)
         db_sess.commit()
+
+    # для списка
+    api.add_resource(user_resources.UserListResource, '/api/users')
+
+    # для одного объекта
+    api.add_resource(user_resources.UserResource, "/api/user/<int:user_id>")
+
     app.run(host="0.0.0.0", port=5000, debug=True)
 
 
