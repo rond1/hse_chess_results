@@ -1,3 +1,4 @@
 .idea/
 token.txt
 backend/.venv/
+frontend/node_modules
