@@ -13,7 +13,7 @@ def abort_if_user_not_found(user_id):
 class UserListResource(Resource):
     def get(self):
         session = db_session.create_session()
-        users = session.query(User).order_by(User.is_activated).all()
+        users = session.query(User).filter_by(is_activated=True).all()
         return jsonify([user.to_dict(only=('id', 'fio', 'email', 'is_activated')) for user in users])
 
 

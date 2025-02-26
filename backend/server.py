@@ -129,6 +129,7 @@ def main():
     db_sess = db_session.create_session()
     if not db_sess.query(User).all():
         user = User()
+        user.is_activated = True
         user.is_admin = True
         user.fio = 'Админ'
         user.email = "admin@admin.ru"
