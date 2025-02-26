@@ -143,7 +143,7 @@ def main():
     api.add_resource(user_resources.UserListResource, '/api/users')
 
     # для одного объекта
-    api.add_resource(user_resources.UserResource, "/api/user/<int:user_id>")
+    api.add_resource(user_resources.UserResource, "/api/users/<int:user_id>")
 
     app.run(host="0.0.0.0", port=5000, debug=True)
 

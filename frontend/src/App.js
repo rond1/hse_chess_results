@@ -5,6 +5,7 @@ import Login from "./components/login";
 import Base from "./components/base";
 import Home from "./components/home";
 import UserList from "./components/users";
+import User from "./components/user";
 
 function App() {
   return (
@@ -15,7 +16,8 @@ function App() {
 
               <Route element={<Base />}>
                   <Route path="/" element={<Home />} />
-                  <Route path="/admin" element={<UserList />} />
+                  <Route path="/users" element={<UserList />} />
+                  <Route path="/users/:id" element={<User />} />
               </Route>
           </Routes>
       </BrowserRouter>

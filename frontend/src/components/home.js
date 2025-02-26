@@ -25,7 +25,7 @@ const Home = () => {
                                 </Button>
                                 {isAdmin() && (
                                     <Button variant="outline-primary" size="lg"
-                                            onClick={(e) => onClick(e, "admin")}
+                                            onClick={(e) => onClick(e, "users")}
                                     >
                                         Заявки на регистрацию
                                     </Button>
