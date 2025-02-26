@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { ListGroup, Container, Spinner } from "react-bootstrap";
+import { ListGroup, Container, Spinner, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
@@ -26,7 +27,12 @@ const UserList = () => {
                 <ListGroup>
                     <ListGroup.Item variant="primary">Список пользователей</ListGroup.Item>
                     {users.map((user) => (
-                        <ListGroup.Item variant="dark" key={user.id}>{user.name}</ListGroup.Item>
+                        <ListGroup.Item variant="dark" key={user.id} className="d-flex justify-content-between align-items-center">
+                            {user.fio}
+                            <Link to={`/user/${user.id}`}>
+                                <Button variant="outline-primary">Посмотреть</Button>
+                            </Link>
+                        </ListGroup.Item>
                     ))}
                 </ListGroup>
             )}

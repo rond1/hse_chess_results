@@ -29,8 +29,8 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
 
-    def to_dict(self):
-        return {
+    def to_dict(self, only=None):
+        data = {
             "id": self.id,
             "fio": self.fio,
             "email": self.email,
@@ -40,3 +40,4 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
             "is_female": self.is_female,
             "is_activated": self.is_activated
         }
+        return {key: data[key] for key in only} if only else data
