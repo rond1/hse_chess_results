@@ -48,7 +48,7 @@ const Login = () => {
             console.log("User data:", userData);
 
             if (userResponse.ok) {
-                localStorage.setItem("user", JSON.stringify({ fio: userData.fio, is_admin: userData.is_admin }));
+                localStorage.setItem("user", JSON.stringify({ fio: userData.fio, is_admin: userData.is_admin, id: userData.id }));
             } else {
                 console.error("Ошибка загрузки пользователя:", userData.error);
             }

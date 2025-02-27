@@ -65,7 +65,7 @@ def get_user():
     user = db_sess.query(User).get(int(user_id))
     if user:
         print(f"Найден пользователь: {user.fio}")
-        return jsonify({"fio": user.fio, "is_admin": user.is_admin}), 200
+        return jsonify({"fio": user.fio, "is_admin": user.is_admin, "id": user_id}), 200
     print("Пользователь не найден")
     return jsonify({"error": "User not found"}), 404
 
