@@ -12,7 +12,7 @@ const Base = () => {
     const handleLogout = (e) => {
         e.preventDefault();
         logout();
-        navigate("/login");
+        navigate("/");
     };
 
     const handleEdit = () => {
