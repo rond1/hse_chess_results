@@ -25,7 +25,7 @@ const User = () => {
         "demo": "Институт демографии",
         "law_dev": "Институт права и развития",
         "miem": "Московский институт электроники и математики (МИЭМ)"
-    }
+    };
 
     const degrees = {
         "1": "1 курс бакалавриата",
@@ -43,7 +43,7 @@ const User = () => {
         "13": "2 курс аспирантуры",
         "14": "3 курс аспирантуры",
         "15": "Выпускник"
-    }
+    };
 
     useEffect(() => {
         axios.get(`http://127.0.0.1:5000/api/users/${id}`)
@@ -57,13 +57,13 @@ const User = () => {
             });
     }, [id]);
 
-    const activateUser = () => {
+    const toggleActivation = (status) => {
         axios.put(`http://127.0.0.1:5000/api/users/${id}`,
-            { is_activated: true },
+            { is_activated: status },
             { headers: { "Content-Type": "application/json" } }
         )
-            .then(() => setUser(prev => ({ ...prev, is_activated: true })))
-            .catch(error => console.error("Ошибка активации:", error));
+            .then(() => setUser(prev => ({ ...prev, is_activated: status })))
+            .catch(error => console.error("Ошибка изменения статуса:", error));
     };
 
     const deleteUser = () => {
@@ -84,9 +84,9 @@ const User = () => {
                 <p><strong>Ступень образования:</strong> {degrees[user.degree]}</p>
                 <p><strong>Статус:</strong> {user.is_activated ? "Активирован" : "Не активирован"}</p>
                 <div className="d-flex gap-2">
-                    {!user.is_activated && (
-                        <Button variant="primary" onClick={activateUser}>Активировать</Button>
-                    )}
+                    <Button variant="primary" onClick={() => toggleActivation(!user.is_activated)}>
+                        {user.is_activated ? "Деактивировать" : "Активировать"}
+                    </Button>
                     <Button variant="dark" onClick={deleteUser}>Удалить</Button>
                 </div>
             </Card>
