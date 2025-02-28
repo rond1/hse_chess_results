@@ -2,6 +2,10 @@ from flask import jsonify, request
 from flask_restful import abort, Resource
 from data import db_session
 from data.users import User
+from werkzeug.security import generate_password_hash
+
+from forms.user_put import UserPutForm
+
 
 def abort_if_user_not_found(user_id):
     session = db_session.create_session()
@@ -22,7 +26,7 @@ class UserResource(Resource):
         abort_if_user_not_found(user_id)
         session = db_session.create_session()
         user = session.query(User).filter_by(id=user_id).first()
-        return jsonify(user.to_dict(only=('id', 'fio', 'email', 'is_activated', 'faculty', 'degree')))
+        return jsonify(user.to_dict(only=('id', 'fio', 'email', 'is_activated', 'faculty', 'degree', 'is_female')))
 
 
     def put(self, user_id):
@@ -30,8 +34,22 @@ class UserResource(Resource):
         session = db_session.create_session()
         user = session.query(User).get(user_id)
         data = request.json
+        print(data)
         if "is_activated" in data:
             user.is_activated = data["is_activated"]
+        else:
+            form = UserPutForm(data=request.json)
+            if not form.validate():
+                return jsonify({"error": "Некорректные данные", "messages": form.errors}), 400
+
+            user.email = form.email.data
+            user.fio = form.fio.data
+            user.gender = form.gender.data
+            user.faculty = form.faculty.data
+            user.degree = form.degree.data
+
+            if form.password.data:
+                user.password = generate_password_hash(form.password.data)
         session.commit()
         return jsonify({'success': 'Пользователь обновлён'})
 

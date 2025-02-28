@@ -16,7 +16,7 @@ const Base = () => {
     };
 
     const handleEdit = () => {
-        navigate("/register");
+        navigate("/edit");
     };
 
     const handleDelete = () => {
