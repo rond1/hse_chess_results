@@ -52,6 +52,7 @@ const EditProfile = () => {
         axios.get(`http://127.0.0.1:5000/api/users/${user.id}`)
             .then(response => {
                 setFormData(response.data);
+                console.log("Полученные данные:", response.data);
             })
             .catch(error => console.error("Ошибка загрузки данных пользователя:", error));
     }, [user.id]);
@@ -115,7 +116,7 @@ const EditProfile = () => {
 
                 <Form.Group controlId="formGender" className="mt-3">
                     <Form.Label>Пол</Form.Label>
-                    <Form.Select name="is_female" value={formData.is_female ? "М" : "Ж"} onChange={handleChange}>
+                    <Form.Select name="is_female" value={formData.is_female ? "Ж" : "М"} onChange={handleChange}>
                         <option value="М">Мужской</option>
                         <option value="Ж">Женский</option>
                     </Form.Select>
