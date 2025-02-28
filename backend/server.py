@@ -86,6 +86,8 @@ def register():
         db_sess = db_session.create_session()
         if db_sess.query(User).filter(User.email == form.email.data).first():
             return jsonify({"errors": {"email": "Этот email уже зарегистрирован"}}), 400
+        if form.gender.data == 'М':
+            form.gender.data = ""
         user = User(
             fio=form.fio.data,
             email=form.email.data,
