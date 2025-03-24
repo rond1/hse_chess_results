@@ -1,5 +1,5 @@
 .idea/
 token.txt
-.venv
+.venv/
 frontend/node_modules
 backend/.env
