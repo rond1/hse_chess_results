@@ -7,6 +7,7 @@ import Home from "./components/home";
 import UserList from "./components/users";
 import User from "./components/user";
 import EditProfile from "./components/edit_user";
+import TournamentList from "./components/tournaments";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/users" element={<UserList />} />
                   <Route path="/users/:id" element={<User />} />
+                  <Route path="/tournaments" element={<TournamentList />} />
               </Route>
           </Routes>
       </BrowserRouter>

@@ -1,19 +1,20 @@
 from dotenv import load_dotenv
 import os
 
+from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_login import login_user, LoginManager
-
-from data import user_resources
-from forms.login import LoginForm
-from forms.user import RegisterForm
 from flask_restful import Api
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, JWTManager, jwt_required, get_jwt_identity
 from flask_wtf.csrf import CSRFProtect
 from flask_sqlalchemy import SQLAlchemy
+
+from data.__all_models import *
+from data import user_resources, tournament_resources
+from forms.login import LoginForm
+from forms.user import RegisterForm
 from data import db_session
-from data.users import User
 
 
 load_dotenv()
@@ -139,13 +140,23 @@ def main():
         user.faculty = 'cs'
         user.degree = '15'
         db_sess.add(user)
+    if not db_sess.query(Tournament).all():
+        new_tournament = Tournament(
+            name="Тестовый турнир",
+            game_time=60,
+            start=datetime.now(),
+            creator_id=1
+        )
+        db_sess.add(new_tournament)
         db_sess.commit()
 
     # для списка
     api.add_resource(user_resources.UserListResource, '/api/users')
+    api.add_resource(tournament_resources.TournamentListResource, '/api/tournaments')
 
     # для одного объекта
     api.add_resource(user_resources.UserResource, "/api/users/<int:user_id>")
+    api.add_resource(tournament_resources.TournamentResource, "/api/tournaments/<int:tournament_id>")
 
     app.run(host="0.0.0.0", port=5000, debug=True)
 
