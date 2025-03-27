@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { ListGroup, Container, Spinner, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { isAuthenticated } from "./auth";
+import { useNavigate } from "react-router-dom";
 
 const TournamentList = () => {
+    const navigate = useNavigate();
     const [tournaments, setTournaments] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -36,6 +39,7 @@ const TournamentList = () => {
                     ))}
                 </ListGroup>
             )}
+            {isAuthenticated() && (<Button variant="dark" className="mt-3" onClick={() => navigate("/tournament/edit")}>Добавить турнир</Button>)}
         </Container>
     );
 };

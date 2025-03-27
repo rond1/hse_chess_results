@@ -15,10 +15,6 @@ const Base = () => {
         navigate("/");
     };
 
-    const handleEdit = () => {
-        navigate("/edit");
-    };
-
     const handleDelete = () => {
         if (window.confirm("Вы уверены, что хотите удалить ваш аккаунт?")) {
             axios.delete(`http://127.0.0.1:5000/api/users/${user.id}`)
@@ -45,7 +41,7 @@ const Base = () => {
                                 <Dropdown.Menu>
                                     {!isAdmin() && (
                                         <>
-                                            <Dropdown.Item onClick={handleEdit}>Изменить</Dropdown.Item>
+                                            <Dropdown.Item onClick={() => navigate("/edit")}>Изменить</Dropdown.Item>
                                             <Dropdown.Item onClick={handleDelete}>Удалить</Dropdown.Item>
                                         </>
                                     )}
