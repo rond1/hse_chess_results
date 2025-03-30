@@ -32,7 +32,7 @@ class Tournament(SqlAlchemyBase, SerializerMixin):
             "name": self.name,
             "game_time": self.game_time,
             "move_time": self.move_time,
-            "start": str(self.start)[:-3],
+            "start": self.start.strftime('%Y-%m-%d %H:%M'),
             "is_finished": ''
         }
         if datetime.now() < self.start:

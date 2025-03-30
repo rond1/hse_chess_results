@@ -8,6 +8,7 @@ import UserList from "./components/users";
 import User from "./components/user";
 import EditProfile from "./components/edit_user";
 import TournamentList from "./components/tournaments";
+import TournamentForm from "./components/add_edit_tournament";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
               <Route path="register" element={<Register />} />
               <Route path="login" element={<Login />} />
               <Route path="edit" element={<EditProfile />} />
+              <Route path="/tournament/edit" element={<TournamentForm />} />
 
               <Route element={<Base />}>
                   <Route path="/" element={<Home />} />

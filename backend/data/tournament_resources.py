@@ -37,14 +37,15 @@ class TournamentListResource(Resource):
 
     def post(self):
         args = parser.parse_args()
+        print(args)
         if args['salt'] != salt:
             return jsonify({'error': 'unsalted'})
         session = db_session.create_session()
         tournament = Tournament(
             name=args['name'],
-            game_time=args['game_time'],
-            move_time=args['move_time'],
-            start=datetime.datetime.strptime(args['start'], '%Y-%m-%dT%H:%M')
+            game_time=int(args['game_time']),
+            move_time=int(args['move_time']),
+            start=datetime.datetime.strptime(args['start'], '%Y-%m-%d %H:%M')
         )
         session.add(tournament)
         session.commit()
