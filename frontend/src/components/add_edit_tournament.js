@@ -2,15 +2,19 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Form, Button, Alert, Container } from "react-bootstrap";
 import axios from "axios";
+import { getUserInfo } from "./auth";
 
 const TournamentForm = () => {
+    const user = getUserInfo();
     const navigate = useNavigate();
     const { tournamentId } = useParams();
     const [formData, setFormData] = useState({
         name: "",
-        game_time: "",
-        move_time: "",
-        start: ""
+        game_time: 30,
+        move_time: 30,
+        start: "",
+        creator_id: user.id,
+        salt: 'salt'
     });
     const [errors, setErrors] = useState({});
     const [message, setMessage] = useState(null);
@@ -50,7 +54,8 @@ const TournamentForm = () => {
                 method: method,
                 url: url,
                 data: formData,
-                headers: { "Content-Type": "application/json" }
+                headers: { "Content-Type": "application/json" },
+                withCredentials: true
             });
 
             if (response.data.errors) {
@@ -60,6 +65,7 @@ const TournamentForm = () => {
                 setTimeout(() => navigate("/tournaments"), 1000);
             }
         } catch (error) {
+            console.error(error);
             setErrors(error.response?.data?.errors || { general: "Ошибка сохранения данных" });
         }
     };
@@ -86,8 +92,11 @@ const TournamentForm = () => {
                 <Form.Group controlId="formGameTime" className="mt-3">
                     <Form.Label>Количество минут</Form.Label>
                     <Form.Control
-                        type="text"
+                        type="number"
                         name="game_time"
+                        min="0"
+                        max="90"
+                        step="1"
                         value={formData.game_time}
                         onChange={handleChange}
                         className={errors.game_time ? "is-invalid" : ""}
@@ -98,8 +107,11 @@ const TournamentForm = () => {
                 <Form.Group controlId="formMoveTime" className="mt-3">
                     <Form.Label>Количество секунд на ход</Form.Label>
                     <Form.Control
-                        type="text"
+                        type="number"
                         name="move_time"
+                        min="1"
+                        max="1800"
+                        step="1"
                         value={formData.move_time}
                         onChange={handleChange}
                         className={errors.move_time ? "is-invalid" : ""}

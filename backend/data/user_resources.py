@@ -34,7 +34,6 @@ class UserResource(Resource):
         session = db_session.create_session()
         user = session.query(User).get(user_id)
         data = request.json
-        print(data)
         if "is_activated" in data and len(data) == 1:
             user.is_activated = data["is_activated"]
         else:

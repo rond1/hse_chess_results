@@ -31,6 +31,7 @@ if not password or not jwt_secret:
 app.config['WTF_CSRF_ENABLED'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://root:{password}@localhost/hse_chess_results'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['PROPAGATE_EXCEPTIONS'] = True
 
 jwt = JWTManager(app)
 csrf = CSRFProtect()
@@ -39,6 +40,17 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:3000"}})
+
+
+@app.before_request
+def handle_options_request():
+    if request.method == 'OPTIONS':
+        response = app.make_response('')
+        response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        return response
 
 
 @app.after_request
@@ -74,13 +86,7 @@ def get_user():
 
 @app.route('/api/register', methods=['POST'])
 def register():
-    print("Полученные данные:", request.json)
     form = RegisterForm(data=request.json)
-
-    if form.validate():
-        print("Форма прошла валидацию")
-    else:
-        print("Ошибки валидации:", form.errors)
     if form.validate():
         if form.password.data != form.password_again.data:
             return jsonify({"errors": {"password": "Пароли не совпадают"}}), 400

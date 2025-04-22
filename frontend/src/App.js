@@ -17,7 +17,8 @@ function App() {
               <Route path="register" element={<Register />} />
               <Route path="login" element={<Login />} />
               <Route path="edit" element={<EditProfile />} />
-              <Route path="/tournament/edit" element={<TournamentForm />} />
+              <Route path="/tournaments/:tournamentId/edit" element={<TournamentForm />} />
+              <Route path="/tournaments/add" element={<TournamentForm />} />
 
               <Route element={<Base />}>
                   <Route path="/" element={<Home />} />

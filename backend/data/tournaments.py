@@ -33,8 +33,7 @@ class Tournament(SqlAlchemyBase, SerializerMixin):
             "game_time": self.game_time,
             "move_time": self.move_time,
             "start": self.start.strftime('%Y-%m-%d %H:%M'),
-            "is_finished": ''
+            "is_finished": self.is_finished,
+            "creator_id": self.creator_id
         }
-        if datetime.now() < self.start:
-            data["is_finished"] = 'Турнир ещё не начался'
         return {key: data[key] for key in only} if only else data

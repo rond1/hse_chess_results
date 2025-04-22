@@ -31,7 +31,7 @@ const TournamentList = () => {
                     <ListGroup.Item variant="primary">Список турниров</ListGroup.Item>
                     {tournaments.map((tournament) => (
                         <ListGroup.Item variant="dark" key={tournament.id} className="d-flex justify-content-between align-items-center">
-                            {`${tournament.name} ${tournament.game_time}:${tournament.move_time} | ${tournament.is_finished} Начало: ${tournament.start}`}
+                            {`${tournament.name} ${tournament.game_time}:${tournament.move_time} | ${tournament.is_finished ? ' Турнир завершен' : ''} Начало: ${tournament.start}`}
                             <Link to={`/tournaments/${tournament.id}`}>
                                 <Button variant="outline-primary">Посмотреть</Button>
                             </Link>
@@ -39,7 +39,7 @@ const TournamentList = () => {
                     ))}
                 </ListGroup>
             )}
-            {isAuthenticated() && (<Button variant="dark" className="mt-3" onClick={() => navigate("/tournament/edit")}>Добавить турнир</Button>)}
+            {isAuthenticated() && (<Button variant="dark" className="mt-3" onClick={() => navigate("/tournaments/add")}>Добавить турнир</Button>)}
         </Container>
     );
 };
