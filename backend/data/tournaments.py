@@ -32,7 +32,7 @@ class Tournament(SqlAlchemyBase, SerializerMixin):
             "name": self.name,
             "game_time": self.game_time,
             "move_time": self.move_time,
-            "start": self.start.strftime('%Y-%m-%d %H:%M'),
+            "start": self.start.strftime('%Y-%m-%dT%H:%M'),
             "is_finished": self.is_finished,
             "creator_id": self.creator_id
         }

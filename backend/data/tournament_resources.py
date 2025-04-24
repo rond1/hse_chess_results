@@ -1,14 +1,12 @@
 import datetime
 
-from flask import jsonify
-from flask_restful import abort, Resource, reqparse
+from flask import jsonify, request
+from flask_restful import abort, Resource
 
 from data import db_session
 from .__all_models import Tournament
 from salt import salt
-
 from forms.tournament import TournamentPostForm
-
 
 def abort_if_tournaments_not_found(tournament_id):
     session = db_session.create_session()
@@ -17,63 +15,41 @@ def abort_if_tournaments_not_found(tournament_id):
         abort(404, message=f"Tournament {tournament_id} not found")
 
 
-parser = reqparse.RequestParser()
-parser.add_argument('name', required=True)
-parser.add_argument('start', required=True)
-parser.add_argument('game_time', required=True, type=int)
-parser.add_argument('move_time', required=True, type=int)
-parser.add_argument('creator_id', required=True, type=int)
-parser.add_argument('salt', required=True)
-
-
 class TournamentListResource(Resource):
     def get(self):
         session = db_session.create_session()
         tournaments = session.query(Tournament).order_by(Tournament.is_finished, Tournament.start.desc()).all()
-        tournaments1 = []
-        for tournament in tournaments:
-            tournament1 = tournament.to_dict(
-                only=('id', 'name', 'game_time', 'move_time', 'start', 'is_finished', 'creator_id'))
-            tournaments1.append(tournament1)
-
-        return jsonify(tournaments1)
+        return jsonify([
+            tournament.to_dict(only=('id', 'name', 'game_time', 'move_time', 'start', 'is_finished', 'creator_id'))
+            for tournament in tournaments
+        ])
 
     def post(self):
-        print("ПОСТ ЗАПРОС ПОЛУЧЕН!")
-        args = parser.parse_args()
-        form = TournamentPostForm(data=args)
+        data = request.get_json(force=True)
+
+        if data.get('salt') != salt:
+            return jsonify({'error': 'unsalted'}), 400
+
+        form = TournamentPostForm(data=data)
         if form.validate():
-            if args['salt'] != salt:
-                return jsonify({'error': 'unsalted'})
+            try:
+                start = datetime.datetime.strptime(data['start'], '%Y-%m-%dT%H:%M')
+            except (KeyError, ValueError):
+                return jsonify({'error': 'Invalid datetime format'}), 400
+
             session = db_session.create_session()
-            str_start = args['start'].replace('T', ' ')
             tournament = Tournament(
-                name=args['name'],
-                game_time=int(args['game_time']),
-                move_time=int(args['move_time']),
-                start=datetime.datetime.strptime(str_start, '%Y-%m-%d %H:%M'),
-                creator_id=int(args['creator_id'])
+                name=data['name'],
+                game_time=data['game_time'],
+                move_time=data['move_time'],
+                start=start,
+                creator_id=data['creator_id']
             )
             session.add(tournament)
             session.commit()
             return jsonify({'success': 'OK'})
-        return jsonify({"errors": form.errors}), 400
 
-
-parser2 = reqparse.RequestParser()
-parser2.add_argument('user_id', type=int)
-parser2.add_argument('salt', required=True)
-
-parser1 = reqparse.RequestParser()
-parser1.add_argument('name', required=True)
-parser1.add_argument('start', required=True)
-parser1.add_argument('game_time', required=True, type=int)
-parser1.add_argument('move_time', required=True, type=int)
-parser1.add_argument('creator_id', required=True, type=int)
-
-parser3 = reqparse.RequestParser()
-parser3.add_argument('salt', required=True)
-parser3.add_argument('user_id', required=True, type=int)
+        return jsonify({'errors': form.errors}), 400
 
 
 class TournamentResource(Resource):
@@ -81,42 +57,46 @@ class TournamentResource(Resource):
         abort_if_tournaments_not_found(tournament_id)
         session = db_session.create_session()
         tournament = session.query(Tournament).get(tournament_id)
-        tournament1 = tournament.to_dict(
-            only=('name', 'game_time', 'move_time', 'start', 'is_finished', 'creator_id'))
-        # categories = []
-        # for category in tournament.categories:
-        #     category1 = category.to_dict(
-        #         only=('id', 'name', 'gender', 'is_finished'))
-        #     category1['groups'] = []
-        #     for group in category.groups:
-        #         category1['groups'].append(group.to_dict(
-        #             only=('id', 'name')))
-        #     categories.append(category1)
-        # tournament1['categories'] = categories
-        return jsonify(tournament1)
+        return jsonify(tournament.to_dict(
+            only=('name', 'game_time', 'move_time', 'start', 'is_finished', 'creator_id')
+        ))
 
     def put(self, tournament_id):
-        args = parser2.parse_args()
-        form = TournamentPostForm(data=args)
-        if form.validate():
-            if args['salt'] != salt:
-                return jsonify({'error': 'unsalted'})
-            session = db_session.create_session()
-            tournament = session.query(Tournament).get(tournament_id)
-            args = parser1.parse_args()
-            tournament.name = args['name']
-            tournament.game_time = args['game_time']
-            tournament.move_time = args['move_time']
-            tournament.start = datetime.datetime.strptime(args['start'], '%Y-%m-%dT%H:%M')
-            tournament.creator_id = args['creator_id']
+        data = request.get_json(force=True)
+
+        if data.get('salt') != salt:
+            return jsonify({'error': 'unsalted'}), 400
+
+        session = db_session.create_session()
+        tournament = session.query(Tournament).get(tournament_id)
+        if not tournament:
+            abort(404, message=f"Tournament {tournament_id} not found")
+
+        if 'is_finished' in data and len(data.keys()) <= 3:
+            tournament.is_finished = data['is_finished']
             session.commit()
             return jsonify({'success': 'OK'})
-        return jsonify({"errors": form.errors}), 400
+
+        try:
+            start = datetime.datetime.strptime(data['start'], '%Y-%m-%dT%H:%M')
+        except (KeyError, ValueError):
+            return jsonify({'error': 'Invalid datetime format'}), 400
+
+        tournament.name = data.get('name')
+        tournament.game_time = data.get('game_time')
+        tournament.move_time = data.get('move_time')
+        tournament.start = start
+        tournament.creator_id = data.get('creator_id')
+        session.commit()
+
+        return jsonify({'success': 'OK'})
 
     def delete(self, tournament_id):
-        args = parser3.parse_args()
-        if args['salt'] != salt:
-            return jsonify({'error': 'unsalted'})
+        data = request.get_json(force=True)
+
+        if data.get('salt') != salt:
+            return jsonify({'error': 'unsalted'}), 400
+
         abort_if_tournaments_not_found(tournament_id)
         session = db_session.create_session()
         tournament = session.query(Tournament).get(tournament_id)

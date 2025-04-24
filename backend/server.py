@@ -31,7 +31,6 @@ if not password or not jwt_secret:
 app.config['WTF_CSRF_ENABLED'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://root:{password}@localhost/hse_chess_results'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['PROPAGATE_EXCEPTIONS'] = True
 
 jwt = JWTManager(app)
 csrf = CSRFProtect()
@@ -151,7 +150,8 @@ def main():
             name="Тестовый турнир",
             game_time=60,
             start=datetime.now(),
-            creator_id=1
+            creator_id=1,
+            is_finished=False
         )
         db_sess.add(new_tournament)
         db_sess.commit()

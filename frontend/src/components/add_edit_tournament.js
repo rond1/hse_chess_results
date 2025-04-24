@@ -5,6 +5,7 @@ import axios from "axios";
 import { getUserInfo } from "./auth";
 
 const TournamentForm = () => {
+    const salt = process.env.REACT_APP_SALT;
     const user = getUserInfo();
     const navigate = useNavigate();
     const { tournamentId } = useParams();
@@ -14,7 +15,7 @@ const TournamentForm = () => {
         move_time: 30,
         start: "",
         creator_id: user.id,
-        salt: 'salt'
+        salt: salt
     });
     const [errors, setErrors] = useState({});
     const [message, setMessage] = useState(null);
@@ -53,7 +54,11 @@ const TournamentForm = () => {
             const response = await axios({
                 method: method,
                 url: url,
-                data: formData,
+                data: {
+                    ...formData,
+                    salt: salt,
+                    creator_id: user.id
+                },
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true
             });
@@ -109,7 +114,7 @@ const TournamentForm = () => {
                     <Form.Control
                         type="number"
                         name="move_time"
-                        min="1"
+                        min="0"
                         max="1800"
                         step="1"
                         value={formData.move_time}

@@ -1,4 +1,6 @@
-import hashlib
+from dotenv import load_dotenv
+import os
 
 
-salt = 'salt'
+load_dotenv()
+salt = os.getenv("salt")
