@@ -54,7 +54,7 @@ class CategoryResource(Resource):
         session = db_session.create_session()
         category = session.query(Category).get(category_id)
         return jsonify(category.to_dict(
-            only=('name', 'tournament_id')
+            only=('name', 'tournament_id', 'creator_id')
         ))
 
     def put(self, category_id):

@@ -18,6 +18,7 @@ class Category(SqlAlchemyBase, SerializerMixin):
         data = {
             "id": self.id,
             "name": self.name,
-            "tournament_id": self.tournament_id
+            "tournament_id": self.tournament_id,
+            "creator_id": self.tournament.to_dict(only=["creator_id"])["creator_id"]
         }
         return {key: data[key] for key in only} if only else data

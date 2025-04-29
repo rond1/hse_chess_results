@@ -171,6 +171,7 @@ def main():
     # для одного объекта
     api.add_resource(user_resources.UserResource, "/api/users/<int:user_id>")
     api.add_resource(tournament_resources.TournamentResource, "/api/tournaments/<int:tournament_id>")
+    api.add_resource(category_resources.CategoryResource, '/api/categories/<int:category_id>')
 
     app.run(host="0.0.0.0", port=5000, debug=True)
 

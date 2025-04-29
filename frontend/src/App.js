@@ -10,6 +10,7 @@ import EditProfile from "./components/edit_user";
 import TournamentList from "./components/tournaments";
 import TournamentForm from "./components/add_edit_tournament";
 import Tournament from "./components/tournament";
+import Category from "./components/category";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
                   <Route path="/users/:id" element={<User />} />
                   <Route path="/tournaments/:tournamentId" element={<Tournament />} />
                   <Route path="/tournaments" element={<TournamentList />} />
+                  <Route path="/categories/:categoryId" element={<Category />} />
               </Route>
           </Routes>
       </BrowserRouter>
