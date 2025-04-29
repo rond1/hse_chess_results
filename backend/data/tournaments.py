@@ -24,6 +24,7 @@ class Tournament(SqlAlchemyBase, SerializerMixin):
                                    ForeignKey('users.id'),
                                    nullable=False)
     creator = relationship('User', backref='tournaments')
+    categories = relationship('Category', back_populates='tournament', cascade="all, delete-orphan")
 
 
     def to_dict(self, only=None):

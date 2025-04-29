@@ -8,10 +8,9 @@ from flask_restful import Api
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, JWTManager, jwt_required, get_jwt_identity
 from flask_wtf.csrf import CSRFProtect
-from flask_sqlalchemy import SQLAlchemy
 
-from data.__all_models import *
-from data import user_resources, tournament_resources
+from data.__all_models import User, Tournament, Category
+from data import user_resources, tournament_resources, category_resources
 from forms.login import LoginForm
 from forms.user import RegisterForm
 from data import db_session
@@ -137,6 +136,7 @@ def main():
     db_sess = db_session.create_session()
     if not db_sess.query(User).all():
         user = User()
+        user.id = 1
         user.is_activated = True
         user.is_admin = True
         user.fio = 'Админ'
@@ -147,6 +147,7 @@ def main():
         db_sess.add(user)
     if not db_sess.query(Tournament).all():
         new_tournament = Tournament(
+            id = 1,
             name="Тестовый турнир",
             game_time=60,
             start=datetime.now(),
@@ -154,11 +155,18 @@ def main():
             is_finished=False
         )
         db_sess.add(new_tournament)
-        db_sess.commit()
+    if not db_sess.query(Category).all():
+        category = Category()
+        category.name = 'Пробная категория'
+        category.tournament_id = 1
+        category.id = 1
+        db_sess.add(category)
+    db_sess.commit()
 
     # для списка
     api.add_resource(user_resources.UserListResource, '/api/users')
     api.add_resource(tournament_resources.TournamentListResource, '/api/tournaments')
+    api.add_resource(category_resources.CategoryListResource, '/api/categories')
 
     # для одного объекта
     api.add_resource(user_resources.UserResource, "/api/users/<int:user_id>")

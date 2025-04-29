@@ -6,6 +6,8 @@ from werkzeug.security import generate_password_hash
 
 from forms.user_put import UserPutForm
 
+from data.tournaments import Tournament
+
 
 def abort_if_user_not_found(user_id):
     session = db_session.create_session()
@@ -57,6 +59,9 @@ class UserResource(Resource):
         abort_if_user_not_found(user_id)
         session = db_session.create_session()
         user = session.query(User).get(user_id)
+        tournaments = session.query(Tournament).filter_by(creator_id=user_id).all()
+        for tournament in tournaments:
+            tournament.creator_id = 1
         session.delete(user)
         session.commit()
         return jsonify({'success': 'Пользователь удалён'})

@@ -31,7 +31,13 @@ const TournamentList = () => {
                     <ListGroup.Item variant="primary">Список турниров</ListGroup.Item>
                     {tournaments.map((tournament) => (
                         <ListGroup.Item variant="dark" key={tournament.id} className="d-flex justify-content-between align-items-center">
-                            {`${tournament.name} ${tournament.game_time}:${tournament.move_time} | ${tournament.is_finished ? ' Турнир завершен' : ''} Начало: ${tournament.start}`}
+                            {`${tournament.name} ${tournament.game_time}:${tournament.move_time} | ${tournament.is_finished ? ' Турнир завершен' : ''} Начало: ${new Date(tournament.start).toLocaleString('ru-RU', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })}`}
                             <Link to={`/tournaments/${tournament.id}`}>
                                 <Button variant="outline-primary">Посмотреть</Button>
                             </Link>
