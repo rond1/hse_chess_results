@@ -32,7 +32,7 @@ const Category = () => {
                 `http://127.0.0.1:5000/api/categories/${categoryId}`,
                 { headers: { "Content-Type": "application/json" }, data: { salt: "salt" } }
             )
-                .then(() => navigate("/categories"))
+                .then(() => navigate(`/tournaments/${category.tournament_id}`))
                 .catch(error => console.error("Ошибка удаления категории:", error));
         }
     };
@@ -51,7 +51,6 @@ const Category = () => {
                 <h2>{category.name}</h2>
                 {(((creator_id && creator_id === category.creator_id) && isAuthenticated()) || isAdmin()) && (
                     <div className="d-flex gap-2 mt-2">
-                        <Button variant="primary" onClick={() => navigate(`/categories/${categoryId}/edit`)}>Изменить</Button>
                         <Button variant="dark" onClick={deleteCategory}>Удалить</Button>
                     </div>
                 )}

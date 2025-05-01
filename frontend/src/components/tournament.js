@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { Card, Button, Spinner, ListGroup, Row, Col } from "react-bootstrap";
 import { getUserInfo, isAdmin, isAuthenticated } from "./auth";
+import CategoryModal from "./add_edit_category";
 
 const Tournament = () => {
     const userInfo = getUserInfo();
@@ -13,6 +14,8 @@ const Tournament = () => {
     const [categories, setCategories] = useState(null);
     const [loadingTournament, setLoadingTournament] = useState(true);
     const [loadingCategories, setLoadingCategories] = useState(true);
+    const [showModal, setShowModal] = useState(false);
+    const [editingCategory, setEditingCategory] = useState(null);
 
     useEffect(() => {
         const fetchTournament = async () => {
@@ -105,18 +108,58 @@ const Tournament = () => {
                 <ListGroup className="mb-3">
                     <ListGroup.Item variant="primary">Список категорий</ListGroup.Item>
                     {categories.map(category => (
-                        <ListGroup.Item key={category.id} variant="dark" className="d-flex justify-content-between align-items-center">
+                        <ListGroup.Item
+                            key={category.id}
+                            variant="dark"
+                            className="d-flex justify-content-between align-items-center"
+                        >
                             {category.name}
-                            <Link to={`/categories/${category.id}`}>
-                                <Button variant="outline-primary">Посмотреть</Button>
-                            </Link>
+                            <div className="d-flex gap-2">
+                                <Link to={`/categories/${category.id}`}>
+                                    <Button variant="outline-primary">Посмотреть</Button>
+                                </Link>
+                                {(((creator_id && creator_id === tournament.creator_id) && isAuthenticated()) || isAdmin()) && (
+                                    <Button
+                                        variant="outline-dark"
+                                        onClick={() => {
+                                            setEditingCategory(category);
+                                            setShowModal(true);
+                                        }}
+                                    >
+                                        Изменить имя
+                                    </Button>
+                                )}
+                            </div>
                         </ListGroup.Item>
                     ))}
                 </ListGroup>
                 {(((creator_id && creator_id === tournament.creator_id) && isAuthenticated()) || isAdmin()) && (
-                    <Button variant="dark" className="mt-3" onClick={() => navigate("/categories/add")}>Добавить категорию</Button>
+                    <Button
+                        variant="dark"
+                        className="mt-3"
+                        onClick={() => {
+                            setEditingCategory(null);
+                            setShowModal(true);
+                        }}
+                    >
+                        Добавить категорию
+                    </Button>
                 )}
             </Col>
+            <CategoryModal
+                show={showModal}
+                onHide={() => {
+                    setShowModal(false);
+                    setEditingCategory(null);
+                }}
+                category={editingCategory}
+                tournamentId={tournamentId}
+                onSave={() => {
+                    axios.get(`http://127.0.0.1:5000/api/categories`, {
+                        params: { tournament_id: tournamentId }
+                    }).then(res => setCategories(res.data));
+                }}
+            />
         </Row>
     );
 };
