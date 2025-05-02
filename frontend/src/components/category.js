@@ -51,7 +51,7 @@ const Category = () => {
                 <h2>{category.name}</h2>
                 {(((creator_id && creator_id === category.creator_id) && isAuthenticated()) || isAdmin()) && (
                     <div className="d-flex gap-2 mt-2">
-                        <Button variant="dark" onClick={deleteCategory}>Удалить</Button>
+                        <Button variant="outline-warning" onClick={deleteCategory}>Удалить</Button>
                     </div>
                 )}
             </Card>

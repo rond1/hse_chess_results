@@ -136,7 +136,7 @@ const TournamentForm = () => {
                     {errors.start && <div className="invalid-feedback">{errors.start}</div>}
                 </Form.Group>
 
-                <Button variant="dark" type="submit" className="mt-3">
+                <Button variant="primary" type="submit" className="mt-3">
                     {tournamentId ? "Сохранить изменения" : "Создать турнир"}
                 </Button>
             </Form>

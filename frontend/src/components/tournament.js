@@ -98,8 +98,8 @@ const Tournament = () => {
                             <Button variant="primary" onClick={() => toggleFinished(!tournament.is_finished)}>
                                 {tournament.is_finished ? "Отметить как не завершенный" : "Отметить как завершенный"}
                             </Button>
-                            <Button variant="secondary" onClick={() => navigate(`/tournaments/${tournamentId}/edit`)}>Изменить</Button>
-                            <Button variant="dark" onClick={deleteTournament}>Удалить</Button>
+                            <Button variant="dark" onClick={() => navigate(`/tournaments/${tournamentId}/edit`)}>Изменить</Button>
+                            <Button variant="outline-warning" onClick={deleteTournament}>Удалить</Button>
                         </div>
                     )}
                 </Card>
@@ -110,7 +110,7 @@ const Tournament = () => {
                     {categories.map(category => (
                         <ListGroup.Item
                             key={category.id}
-                            variant="dark"
+                            variant="warning"
                             className="d-flex justify-content-between align-items-center"
                         >
                             {category.name}
@@ -135,7 +135,7 @@ const Tournament = () => {
                 </ListGroup>
                 {(((creator_id && creator_id === tournament.creator_id) && isAuthenticated()) || isAdmin()) && (
                     <Button
-                        variant="dark"
+                        variant="primary"
                         className="mt-3"
                         onClick={() => {
                             setEditingCategory(null);

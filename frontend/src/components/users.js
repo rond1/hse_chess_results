@@ -27,7 +27,7 @@ const UserList = () => {
                 <ListGroup>
                     <ListGroup.Item variant="primary">Список пользователей</ListGroup.Item>
                     {users.map((user) => (
-                        <ListGroup.Item variant="dark" key={user.id} className="d-flex justify-content-between align-items-center">
+                        <ListGroup.Item variant="warning" key={user.id} className="d-flex justify-content-between align-items-center">
                             {user.fio}
                             <Link to={`/users/${user.id}`}>
                                 <Button variant="outline-primary">Посмотреть</Button>

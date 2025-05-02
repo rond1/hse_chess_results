@@ -87,7 +87,7 @@ const User = () => {
                     <Button variant="primary" onClick={() => toggleActivation(!user.is_activated)}>
                         {user.is_activated ? "Деактивировать" : "Активировать"}
                     </Button>
-                    <Button variant="dark" onClick={deleteUser}>Удалить</Button>
+                    <Button variant="outline-warning" onClick={deleteUser}>Удалить</Button>
                 </div>
             </Card>
         </Container>

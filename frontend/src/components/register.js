@@ -189,7 +189,7 @@ const Register = () => {
                     {errors.degree && <div className="invalid-feedback">{errors.degree}</div>}
                 </Form.Group>
 
-                <Button variant="outline-primary" type="submit" className="mt-3">
+                <Button variant="primary" type="submit" className="mt-3">
                     Зарегистрироваться
                 </Button>
             </Form>

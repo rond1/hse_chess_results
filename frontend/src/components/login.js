@@ -102,7 +102,7 @@ const Login = () => {
                     />
                 </Form.Group>
 
-                <Button variant="dark" type="submit" className="mt-3">Войти</Button>
+                <Button variant="primary" type="submit" className="mt-3">Войти</Button>
             </Form>
         </Container>
     );

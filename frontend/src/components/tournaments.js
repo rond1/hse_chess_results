@@ -30,7 +30,7 @@ const TournamentList = () => {
                 <ListGroup>
                     <ListGroup.Item variant="primary">Список турниров</ListGroup.Item>
                     {tournaments.map((tournament) => (
-                        <ListGroup.Item variant="dark" key={tournament.id} className="d-flex justify-content-between align-items-center">
+                        <ListGroup.Item variant="warning" key={tournament.id} className="d-flex justify-content-between align-items-center">
                             {`${tournament.name} ${tournament.game_time}:${tournament.move_time} | ${tournament.is_finished ? ' Турнир завершен' : ''} Начало: ${new Date(tournament.start).toLocaleString('ru-RU', {
                                 day: '2-digit',
                                 month: '2-digit',
@@ -45,7 +45,7 @@ const TournamentList = () => {
                     ))}
                 </ListGroup>
             )}
-            {isAuthenticated() && (<Button variant="dark" className="mt-3" onClick={() => navigate("/tournaments/add")}>Добавить турнир</Button>)}
+            {isAuthenticated() && (<Button variant="primary" className="mt-3" onClick={() => navigate("/tournaments/add")}>Добавить турнир</Button>)}
         </Container>
     );
 };

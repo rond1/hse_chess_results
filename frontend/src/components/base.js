@@ -28,14 +28,24 @@ const Base = () => {
 
     return (
         <>
-            <Navbar bg="dark" variant="dark" expand="lg">
+            <Navbar bg="primary" variant="dark" expand="lg">
                 <Container>
-                    <Navbar.Brand onClick={() => navigate("/")}>HSE Chess Results</Navbar.Brand>
+                    <Navbar.Brand onClick={() => navigate("/")}>
+                        <img
+                            alt=""
+                            src="/logo.svg"
+                            width="30"
+                            height="30"
+                            className="d-inline-block align-top"
+                        />
+                        {' '}
+                        HSE Chess Results
+                    </Navbar.Brand>
                     <Navbar.Toggle aria-controls="navbar-nav" />
                     <Navbar.Collapse id="navbar-nav" className="justify-content-end">
                         {isAuthenticated() ? (
                             <Dropdown show={showDropdown} onToggle={() => setShowDropdown(!showDropdown)}>
-                                <Dropdown.Toggle variant="dark" className="text-light border-0">
+                                <Dropdown.Toggle variant="primary" className="text-light border-0">
                                     {user ? user.fio : "Загрузка..."}
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
@@ -45,12 +55,12 @@ const Base = () => {
                                             <Dropdown.Item onClick={handleDelete}>Удалить</Dropdown.Item>
                                         </>
                                     )}
-                                    <Dropdown.Item onClick={handleLogout} className="text-danger">Выйти</Dropdown.Item>
+                                    <Dropdown.Item onClick={handleLogout} className="text-warning">Выйти</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                         ) : (
                             <Nav>
-                                <Button variant="outline-primary" onClick={() => navigate("/register")} className="me-2">
+                                <Button variant="outline-warning" onClick={() => navigate("/register")} className="me-2">
                                     Зарегистрироваться
                                 </Button>
                                 <Button variant="outline-light" onClick={() => navigate("/login")}>

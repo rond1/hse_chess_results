@@ -24,7 +24,7 @@ const Home = () => {
                                     Турниры
                                 </Button>
                                 {isAdmin() && (
-                                    <Button variant="outline-primary" size="lg"
+                                    <Button variant="outline-warning" size="lg"
                                             onClick={(e) => onClick(e, "users")}
                                     >
                                         Заявки на регистрацию
