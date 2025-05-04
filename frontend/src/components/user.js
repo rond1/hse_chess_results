@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Container, Card, Button, Spinner } from "react-bootstrap";
+import {useHelmetTitle} from "../hooks/indexHooks";
 
 const User = () => {
     const { id } = useParams();
@@ -71,6 +72,8 @@ const User = () => {
             .then(() => navigate("/users"))
             .catch(error => console.error("Ошибка удаления:", error));
     };
+
+    useHelmetTitle(user ? user.fio : "Пользователь");
 
     if (loading) return <Spinner animation="border" />;
     if (!user) return <p>Пользователь не найден</p>;

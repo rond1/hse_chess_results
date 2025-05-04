@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Alert, Container } from "react-bootstrap";
+import {useHelmetTitle} from "../hooks/indexHooks";
 
 const FACULTIES = [
     ["cs", "Факультет компьютерных наук"],
@@ -40,6 +41,7 @@ const DEGREES = [
 ];
 
 const Register = () => {
+    useHelmetTitle("Регистрация");
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         email: "",

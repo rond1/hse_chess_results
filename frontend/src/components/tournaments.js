@@ -4,8 +4,10 @@ import { ListGroup, Container, Spinner, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { isAuthenticated } from "./auth";
 import { useNavigate } from "react-router-dom";
+import {useHelmetTitle} from "../hooks/indexHooks";
 
 const TournamentList = () => {
+    useHelmetTitle("Турниры");
     const navigate = useNavigate();
     const [tournaments, setTournaments] = useState([]);
     const [loading, setLoading] = useState(true);

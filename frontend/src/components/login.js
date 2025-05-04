@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Alert, Container } from "react-bootstrap";
+import {useHelmetTitle} from "../hooks/indexHooks";
 
 const Login = () => {
+    useHelmetTitle("Вход");
     const navigate = useNavigate();
     const [formData, setFormData] = useState({ email: "", password: "", rememberMe: false });
     const [errors, setErrors] = useState({email: "", password: ""});

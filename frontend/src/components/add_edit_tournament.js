@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Form, Button, Alert, Container } from "react-bootstrap";
 import axios from "axios";
 import { getUserInfo } from "./auth";
+import {useHelmetTitle} from "../hooks/indexHooks";
 
 const TournamentForm = () => {
     const salt = process.env.REACT_APP_SALT;
@@ -19,6 +20,8 @@ const TournamentForm = () => {
     });
     const [errors, setErrors] = useState({});
     const [message, setMessage] = useState(null);
+
+    useHelmetTitle(tournamentId ? "Редактирование турнира" : "Создание турнира");
 
     useEffect(() => {
         if (tournamentId) {

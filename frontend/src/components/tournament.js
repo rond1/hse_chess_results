@@ -4,6 +4,7 @@ import axios from "axios";
 import { Card, Button, Spinner, ListGroup, Row, Col } from "react-bootstrap";
 import { getUserInfo, isAdmin, isAuthenticated } from "./auth";
 import CategoryModal from "./add_edit_category";
+import {useHelmetTitle} from "../hooks/indexHooks";
 
 const Tournament = () => {
     const userInfo = getUserInfo();
@@ -70,6 +71,8 @@ const Tournament = () => {
                 .catch(error => console.error("Ошибка удаления турнира:", error));
         }
     };
+
+    useHelmetTitle(tournament ? tournament.name : "Турнир");
 
     if (loadingTournament || loadingCategories) {
         return <Spinner animation="border" />;

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import {Card, Button, Spinner, Container} from "react-bootstrap";
 import { getUserInfo, isAdmin, isAuthenticated } from "./auth";
+import {useHelmetTitle} from "../hooks/indexHooks";
 
 const Category = () => {
     const userInfo = getUserInfo();
@@ -36,6 +37,8 @@ const Category = () => {
                 .catch(error => console.error("Ошибка удаления категории:", error));
         }
     };
+
+    useHelmetTitle(category ? category.name : "Категория");
 
     if (loading) {
         return <Spinner animation="border" />;

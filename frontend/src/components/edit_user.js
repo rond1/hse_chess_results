@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Form, Button, Alert, Container } from "react-bootstrap";
 import axios from "axios";
 import { getUserInfo } from "./auth";
+import {useHelmetTitle} from "../hooks/indexHooks";
 
 const FACULTIES = [
     ["cs", "Факультет компьютерных наук"],
@@ -42,6 +43,7 @@ const DEGREES = [
 ];
 
 const EditProfile = () => {
+    useHelmetTitle("Редактирование профиля");
     const navigate = useNavigate();
     const user = getUserInfo();
     const [formData, setFormData] = useState(null);

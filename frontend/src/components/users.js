@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { ListGroup, Container, Spinner, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import {useHelmetTitle} from "../hooks/indexHooks";
 
 const UserList = () => {
+    useHelmetTitle("Пользователи");
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
 
