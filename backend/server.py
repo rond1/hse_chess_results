@@ -9,8 +9,8 @@ from flask_cors import CORS
 from flask_jwt_extended import create_access_token, JWTManager, jwt_required, get_jwt_identity
 from flask_wtf.csrf import CSRFProtect
 
-from data.__all_models import User, Tournament, Category
-from data import user_resources, tournament_resources, category_resources
+from data.__all_models import *
+from data import user_resources, tournament_resources, category_resources, round_resources
 from forms.login import LoginForm
 from forms.user import RegisterForm
 from data import db_session
@@ -172,11 +172,13 @@ def main():
     api.add_resource(user_resources.UserListResource, '/api/users')
     api.add_resource(tournament_resources.TournamentListResource, '/api/tournaments')
     api.add_resource(category_resources.CategoryListResource, '/api/categories')
+    api.add_resource(round_resources.RoundListResource, '/api/rounds')
 
     # для одного объекта
     api.add_resource(user_resources.UserResource, "/api/users/<int:user_id>")
     api.add_resource(tournament_resources.TournamentResource, "/api/tournaments/<int:tournament_id>")
     api.add_resource(category_resources.CategoryResource, '/api/categories/<int:category_id>')
+    api.add_resource(round_resources.RoundResource, '/api/rounds/<int:round_id>')
 
     app.run(host="0.0.0.0", port=5000, debug=True)
 
