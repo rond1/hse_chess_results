@@ -58,7 +58,7 @@ const CategoryModal = ({ show, onHide, category, tournamentId, onSave }) => {
                 </Form>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={onHide} disabled={saving}>
+                <Button variant="outline-warning" onClick={onHide} disabled={saving}>
                     Закрыть
                 </Button>
                 <Button variant="primary" onClick={handleSave} disabled={!categoryName.trim() || saving}>
