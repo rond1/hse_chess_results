@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Form, Button, Alert, Container } from "react-bootstrap";
-import axios from "axios";
+import { Form, Button, Alert, Container, Spinner } from "react-bootstrap";
+import axios from "../instances/axiosInstance";
 import { getUserInfo } from "./auth";
-import {useHelmetTitle} from "../hooks/indexHooks";
+import { useHelmetTitle } from "../hooks/indexHooks";
 
 const TournamentForm = () => {
     const salt = process.env.REACT_APP_SALT;
@@ -20,67 +20,82 @@ const TournamentForm = () => {
     });
     const [errors, setErrors] = useState({});
     const [message, setMessage] = useState(null);
+    const [saving, setSaving] = useState(false);
 
     useHelmetTitle(tournamentId ? "Редактирование турнира" : "Создание турнира");
 
     useEffect(() => {
         if (tournamentId) {
-            axios.get(`http://127.0.0.1:5000/api/tournaments/${tournamentId}`)
+            axios.get(`/tournaments/${tournamentId}`)
                 .then(response => {
-                    setFormData(response.data);
+                    setFormData({
+                        ...response.data,
+                        start: response.data.start.slice(0, 16)
+                    });
                 })
                 .catch(error => {
-                    console.error("Ошибка загрузки данных турнира:", error);
+                    console.error("Ошибка загрузки турнира:", error);
                     setMessage("Не удалось загрузить данные турнира.");
                 });
         }
     }, [tournamentId]);
 
-    const handleChange = (e) => {
+    const handleChange = useCallback((e) => {
         const { name, value } = e.target;
-        setFormData(prevState => ({ ...prevState, [name]: value }));
-    };
+        setFormData(prev => ({ ...prev, [name]: value }));
+    }, []);
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = useCallback(async (e) => {
         e.preventDefault();
         setErrors({});
         setMessage(null);
+        setSaving(true);
 
         try {
-            console.log(formData);
             const url = tournamentId
-                ? `http://127.0.0.1:5000/api/tournaments/${tournamentId}`
-                : "http://127.0.0.1:5000/api/tournaments";
-            const method = tournamentId ? "PUT" : "POST";
-            console.log(url, method, formData);
+                ? `/tournaments/${tournamentId}`
+                : "/tournaments";
+
+            const method = tournamentId ? "put" : "post";
 
             const response = await axios({
-                method: method,
-                url: url,
+                method,
+                url,
                 data: {
                     ...formData,
+                    creator_id: user.id,
                     salt: salt,
-                    creator_id: user.id
-                },
-                headers: { "Content-Type": "application/json" },
-                withCredentials: true
+                }
             });
 
             if (response.data.errors) {
                 setErrors(response.data.errors);
             } else {
                 setMessage(tournamentId ? "Турнир обновлён!" : "Турнир создан!");
+                if (!tournamentId) {
+                    setFormData({
+                        name: "",
+                        game_time: 30,
+                        move_time: 30,
+                        start: "",
+                        creator_id: user.id,
+                        salt: salt
+                    });
+                }
                 setTimeout(() => navigate("/tournaments"), 1000);
             }
         } catch (error) {
-            console.error(error);
+            console.error("Ошибка при сохранении:", error);
             setErrors(error.response?.data?.errors || { general: "Ошибка сохранения данных" });
+        } finally {
+            setSaving(false);
         }
-    };
+    }, [formData, navigate, salt, tournamentId, user.id]);
 
     return (
         <Container className="mt-4">
             <h1>{tournamentId ? "Редактирование турнира" : "Создание турнира"}</h1>
+
             {message && <Alert variant="success">{message}</Alert>}
             {errors.general && <Alert variant="danger">{errors.general}</Alert>}
 
@@ -139,8 +154,13 @@ const TournamentForm = () => {
                     {errors.start && <div className="invalid-feedback">{errors.start}</div>}
                 </Form.Group>
 
-                <Button variant="primary" type="submit" className="mt-3">
-                    {tournamentId ? "Сохранить изменения" : "Создать турнир"}
+                <Button
+                    variant="primary"
+                    type="submit"
+                    className="mt-3"
+                    disabled={saving}
+                >
+                    {saving ? <Spinner animation="border" size="sm" /> : tournamentId ? "Сохранить изменения" : "Создать турнир"}
                 </Button>
             </Form>
         </Container>

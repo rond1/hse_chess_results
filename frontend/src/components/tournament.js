@@ -1,61 +1,60 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import axios from "axios";
-import { Card, Button, Spinner, ListGroup, Row, Col } from "react-bootstrap";
+import { Card, Button, Spinner, ListGroup, Row, Col, Alert } from "react-bootstrap";
 import { getUserInfo, isAdmin, isAuthenticated } from "./auth";
 import CategoryModal from "./add_edit_category";
-import {useHelmetTitle} from "../hooks/indexHooks";
+import { useHelmetTitle } from "../hooks/indexHooks";
+import axios from "../instances/axiosInstance";
 
 const Tournament = () => {
+    const salt = process.env.REACT_APP_SALT;
     const userInfo = getUserInfo();
     const creator_id = userInfo ? Number(userInfo.id) : null;
     const { tournamentId } = useParams();
     const navigate = useNavigate();
     const [tournament, setTournament] = useState(null);
-    const [categories, setCategories] = useState(null);
+    const [categories, setCategories] = useState([]);
     const [loadingTournament, setLoadingTournament] = useState(true);
     const [loadingCategories, setLoadingCategories] = useState(true);
+    const [error, setError] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [editingCategory, setEditingCategory] = useState(null);
 
-    useEffect(() => {
-        const fetchTournament = async () => {
-            try {
-                const response = await axios.get(`http://127.0.0.1:5000/api/tournaments/${tournamentId}`);
-                setTournament(response.data);
-            } catch (error) {
-                console.error("Ошибка загрузки турнира:", error);
-            } finally {
-                setLoadingTournament(false);
-            }
-        };
-        fetchTournament();
-    }, [tournamentId]);
-
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const response = await axios.get(`http://127.0.0.1:5000/api/categories`, {
-                    params: { tournament_id: tournamentId }
-                });
-                setCategories(response.data);
-            } catch (error) {
-                console.error("Ошибка загрузки категорий:", error);
-            } finally {
-                setLoadingCategories(false);
-            }
-        };
-
-        if (tournamentId) {
-            fetchCategories();
+    const fetchTournament = useCallback(async () => {
+        try {
+            const response = await axios.get(`/tournaments/${tournamentId}`);
+            setTournament(response.data);
+        } catch (error) {
+            setError("Ошибка загрузки турнира");
+        } finally {
+            setLoadingTournament(false);
         }
     }, [tournamentId]);
 
-    const toggleFinished = (status) => {
-        axios.put(
-            `http://127.0.0.1:5000/api/tournaments/${tournamentId}`,
-            { is_finished: status, creator_id, salt: "salt" },
-            { headers: { "Content-Type": "application/json" } }
+    const fetchCategories = useCallback(async () => {
+        try {
+            const response = await axios.get(`/categories`, {
+                params: { tournament_id: tournamentId }
+            });
+            setCategories(response.data);
+        } catch (error) {
+            setError("Ошибка загрузки категорий");
+        } finally {
+            setLoadingCategories(false);
+        }
+    }, [tournamentId]);
+
+    useEffect(() => {
+        if (tournamentId) {
+            fetchTournament();
+            fetchCategories();
+        }
+    }, [fetchTournament, fetchCategories, tournamentId]);
+
+    const toggleFinished = async (status) => {
+        await axios.put(
+            `/tournaments/${tournamentId}`,
+            { is_finished: status, creator_id, salt: salt }
         )
             .then(() => setTournament(prev => ({ ...prev, is_finished: status })))
             .catch(error => console.error("Ошибка изменения статуса:", error));
@@ -64,8 +63,8 @@ const Tournament = () => {
     const deleteTournament = () => {
         if (window.confirm("Вы уверены, что хотите удалить турнир?")) {
             axios.delete(
-                `http://127.0.0.1:5000/api/tournaments/${tournamentId}`,
-                { headers: { "Content-Type": "application/json" }, data: { creator_id, salt: "salt" } }
+                `/tournaments/${tournamentId}`,
+                { data: { creator_id, salt: salt } }
             )
                 .then(() => navigate("/tournaments"))
                 .catch(error => console.error("Ошибка удаления турнира:", error));
@@ -76,6 +75,10 @@ const Tournament = () => {
 
     if (loadingTournament || loadingCategories) {
         return <Spinner animation="border" />;
+    }
+
+    if (error) {
+        return <Alert variant="danger">{error}</Alert>;
     }
 
     if (!tournament) {
@@ -95,7 +98,7 @@ const Tournament = () => {
                         hour: '2-digit',
                         minute: '2-digit'
                     })}</p>
-                    <p><strong>Статус:</strong> {tournament.is_finished ? "Не завершен" : "Завершен"}</p>
+                    <p><strong>Статус:</strong> {tournament.is_finished ? "Завершен" : "Не завершен"}</p>
                     {(((creator_id && creator_id === tournament.creator_id) && isAuthenticated()) || isAdmin()) && (
                         <div className="d-flex gap-2">
                             <Button variant="primary" onClick={() => toggleFinished(!tournament.is_finished)}>
@@ -158,9 +161,7 @@ const Tournament = () => {
                 category={editingCategory}
                 tournamentId={tournamentId}
                 onSave={() => {
-                    axios.get(`http://127.0.0.1:5000/api/categories`, {
-                        params: { tournament_id: tournamentId }
-                    }).then(res => setCategories(res.data));
+                    fetchCategories();
                 }}
             />
         </Row>

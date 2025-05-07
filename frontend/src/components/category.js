@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../instances/axiosInstance";
 import {Card, Button, Spinner, Container} from "react-bootstrap";
 import { getUserInfo, isAdmin, isAuthenticated } from "./auth";
 import {useHelmetTitle} from "../hooks/indexHooks";
 
 const Category = () => {
+    const salt = process.env.REACT_APP_SALT;
     const userInfo = getUserInfo();
     const creator_id = userInfo ? Number(userInfo.id) : null;
     const { categoryId } = useParams();
@@ -16,7 +17,7 @@ const Category = () => {
     useEffect(() => {
         const fetchCategory = async () => {
             try {
-                const response = await axios.get(`http://127.0.0.1:5000/api/categories/${categoryId}`);
+                const response = await axios.get(`/categories/${categoryId}`);
                 setCategory(response.data);
             } catch (error) {
                 console.error("Ошибка загрузки категории:", error);
@@ -30,8 +31,8 @@ const Category = () => {
     const deleteCategory = () => {
         if (window.confirm("Вы уверены, что хотите удалить категорию?")) {
             axios.delete(
-                `http://127.0.0.1:5000/api/categories/${categoryId}`,
-                { headers: { "Content-Type": "application/json" }, data: { salt: "salt" } }
+                `/categories/${categoryId}`,
+                { data: { salt: salt } }
             )
                 .then(() => navigate(`/tournaments/${category.tournament_id}`))
                 .catch(error => console.error("Ошибка удаления категории:", error));

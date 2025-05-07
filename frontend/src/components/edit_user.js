@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Alert, Container } from "react-bootstrap";
-import axios from "axios";
+import axios from "../instances/axiosInstance";
 import { getUserInfo } from "./auth";
 import {useHelmetTitle} from "../hooks/indexHooks";
 
@@ -51,7 +51,7 @@ const EditProfile = () => {
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
-        axios.get(`http://127.0.0.1:5000/api/users/${user.id}`)
+        axios.get(`/users/${user.id}`)
             .then(response => {
                 setFormData(response.data);
                 console.log("Полученные данные:", response.data);
@@ -74,9 +74,7 @@ const EditProfile = () => {
         setMessage(null);
 
         try {
-            const response = await axios.put(`http://127.0.0.1:5000/api/users/${user.id}`, formData, {
-                headers: { "Content-Type": "application/json" }
-            });
+            const response = await axios.put(`/users/${user.id}`, formData);
 
             if (response.data.errors) {
                 setErrors(response.data.errors);

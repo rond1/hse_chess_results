@@ -1,15 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { Container, Card, Button, Spinner } from "react-bootstrap";
-import {useHelmetTitle} from "../hooks/indexHooks";
+import axios from "../instances/axiosInstance";
+import { Container, Card, Button, Spinner, Alert } from "react-bootstrap";
+import { useHelmetTitle } from "../hooks/indexHooks";
 
 const User = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+
     const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const facs = {
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const facs = React.useMemo(() => ({
         "cs": "Факультет компьютерных наук",
         "math": "Факультет математики",
         "soc": "Факультет социальных наук",
@@ -26,9 +29,9 @@ const User = () => {
         "demo": "Институт демографии",
         "law_dev": "Институт права и развития",
         "miem": "Московский институт электроники и математики (МИЭМ)"
-    };
+    }), []);
 
-    const degrees = {
+    const degrees = React.useMemo(() => ({
         "1": "1 курс бакалавриата",
         "2": "2 курс бакалавриата",
         "3": "3 курс бакалавриата",
@@ -44,38 +47,39 @@ const User = () => {
         "13": "2 курс аспирантуры",
         "14": "3 курс аспирантуры",
         "15": "Выпускник"
-    };
+    }), []);
+
+    const handleError = useCallback((error) => {
+        console.error("Ошибка загрузки пользователя:", error);
+        setError("Не удалось загрузить информацию о пользователе. Попробуйте позже.");
+        setIsLoading(false);
+    }, []);
 
     useEffect(() => {
-        axios.get(`http://127.0.0.1:5000/api/users/${id}`)
+        axios.get(`/users/${id}`)
             .then(response => {
                 setUser(response.data);
-                setLoading(false);
+                setIsLoading(false);
             })
-            .catch(error => {
-                console.error("Ошибка загрузки пользователя:", error);
-                setLoading(false);
-            });
-    }, [id]);
+            .catch(handleError);
+    }, [id, handleError]);
 
-    const toggleActivation = (status) => {
-        axios.put(`http://127.0.0.1:5000/api/users/${id}`,
-            { is_activated: status },
-            { headers: { "Content-Type": "application/json" } }
-        )
+    const toggleActivation = useCallback((status) => {
+        axios.put(`/users/${id}`, { is_activated: status })
             .then(() => setUser(prev => ({ ...prev, is_activated: status })))
             .catch(error => console.error("Ошибка изменения статуса:", error));
-    };
+    }, [id]);
 
-    const deleteUser = () => {
-        axios.delete(`http://127.0.0.1:5000/api/users/${id}`)
+    const deleteUser = useCallback(() => {
+        axios.delete(`/users/${id}`)
             .then(() => navigate("/users"))
             .catch(error => console.error("Ошибка удаления:", error));
-    };
+    }, [id, navigate]);
 
-    useHelmetTitle(user ? user.fio : "Пользователь");
+    useHelmetTitle(user?.fio || "Пользователь");
 
-    if (loading) return <Spinner animation="border" />;
+    if (isLoading) return <Spinner animation="border" />;
+    if (error) return <Alert variant="danger">{error}</Alert>;
     if (!user) return <p>Пользователь не найден</p>;
 
     return (

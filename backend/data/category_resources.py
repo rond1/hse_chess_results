@@ -1,3 +1,4 @@
+from sqlalchemy.exc import SQLAlchemyError
 from flask import jsonify, request
 from flask_restful import abort, Resource
 
@@ -83,5 +84,9 @@ class CategoryResource(Resource):
         session = db_session.create_session()
         category = session.query(Category).get(category_id)
         session.delete(category)
-        session.commit()
+        try:
+            session.commit()
+        except SQLAlchemyError as e:
+            session.rollback()
+            return jsonify({'error': str(e)}), 500
         return jsonify({'success': 'OK'})

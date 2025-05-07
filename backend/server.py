@@ -37,7 +37,7 @@ csrf.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:3000"}})
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:3000"}}, always_send=True)
 
 
 @app.before_request
@@ -58,6 +58,11 @@ def apply_cors_headers(response):
     response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
     response.headers["Access-Control-Allow-Credentials"] = "true"
     return response
+
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db_session.scoped_session_factory.remove()
 
 
 @login_manager.user_loader

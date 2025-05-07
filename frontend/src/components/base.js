@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Navbar, Nav, Button, Container, Dropdown } from "react-bootstrap";
 import { Outlet, useNavigate } from "react-router-dom";
 import { isAuthenticated, logout, getUserInfo, isAdmin } from "./auth";
-import axios from "axios";
+import axios from "../instances/axiosInstance";
 
 const Base = () => {
     const navigate = useNavigate();
@@ -17,7 +17,7 @@ const Base = () => {
 
     const handleDelete = () => {
         if (window.confirm("Вы уверены, что хотите удалить ваш аккаунт?")) {
-            axios.delete(`http://127.0.0.1:5000/api/users/${user.id}`)
+            axios.delete(`/users/${user.id}`)
                 .then(() => {
                     logout();
                     navigate("/register");

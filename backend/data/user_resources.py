@@ -62,6 +62,7 @@ class UserResource(Resource):
         tournaments = session.query(Tournament).filter_by(creator_id=user_id).all()
         for tournament in tournaments:
             tournament.creator_id = 1
+        session.commit()
         session.delete(user)
         session.commit()
         return jsonify({'success': 'Пользователь удалён'})
