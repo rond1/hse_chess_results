@@ -11,6 +11,7 @@ import TournamentList from "./components/tournaments";
 import TournamentForm from "./components/add_edit_tournament";
 import Tournament from "./components/tournament";
 import Category from "./components/category";
+import Round from "./components/round";
 
 function App() {
   return (
@@ -28,7 +29,9 @@ function App() {
                   <Route path="/users/:id" element={<User />} />
                   <Route path="/tournaments/:tournamentId" element={<Tournament />} />
                   <Route path="/tournaments" element={<TournamentList />} />
-                  <Route path="/categories/:categoryId" element={<Category />} />
+                  <Route path="/categories/:categoryId" element={<Category />}>
+                      <Route path="rounds/:roundId" element={<Round />} />
+                  </Route>
               </Route>
           </Routes>
       </BrowserRouter>

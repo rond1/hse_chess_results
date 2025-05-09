@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, Outlet } from "react-router-dom";
 import { Card, Button, Spinner, Container, Alert } from "react-bootstrap";
 import { getUserInfo, isAdmin, isAuthenticated } from "./auth";
 import { useHelmetTitle } from "../hooks/indexHooks";
+import RoundsContext from "../contexts/RoundsContext";
 import RoundModal from "./add_edit_round"
 import axios from "../instances/axiosInstance";
 
@@ -75,50 +76,57 @@ const Category = () => {
     }
 
     return (
-        <Container className="mt-4">
-            <Card className="p-4" style={{ width: "100%" }}>
-                <h2>{category.name}</h2>
-                {rounds.length > 0 ? (
-                    <div className="d-flex flex-wrap gap-3">
-                        {rounds.map(round => (
-                            <Link to={`/rounds/${round.id}`} className="text-primary">
-                                {round.name} {new Date(round.date).toLocaleString('ru-RU', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit' })}   </Link>
-                        ))}
-                    </div>
-                ) : (
-                    <p>Туры ещё не добавлены.</p>
-                )}
-                {(((creator_id && creator_id === category.creator_id) && isAuthenticated()) || isAdmin()) && (
-                    <div className="d-flex gap-2 mt-2">
-                        <Button
-                            variant="primary"
-                            onClick={() => {
-                                setEditingRound(null);
-                                setShowModalRound(true);
-                            }}
-                        >
-                            Добавить тур
-                        </Button>
-                        <Button variant="outline-warning" onClick={deleteCategory}>Удалить категорию</Button>
-                    </div>
-                )}
-            </Card>
-            <RoundModal
-                show={showModalRound}
-                onHide={() => {
-                    setShowModalRound(false);
-                    setEditingRound(null);
-                }}
-                round={editingRound}
-                categoryId={categoryId}
-                onSave={fetchRounds}
-            />
-        </Container>
+        <RoundsContext.Provider value={{ fetchRounds }}>
+            <Container className="mt-4">
+                <Card className="p-4" style={{ width: "100%" }}>
+                    <h2>{category.name}</h2>
+                    {rounds.length > 0 ? (
+                        <div className="d-flex flex-wrap gap-3">
+                            {rounds.map(round => (
+                                <Link key={round.id} to={`rounds/${round.id}`} className="text-primary">
+                                    {round.name} {new Date(round.date).toLocaleString('ru-RU', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit' })}   </Link>
+                            ))}
+                        </div>
+                    ) : (
+                        <p>Туры ещё не добавлены.</p>
+                    )}
+                    {(((creator_id && creator_id === category.creator_id) && isAuthenticated()) || isAdmin()) && (
+                        <div className="d-flex gap-2 mt-2">
+                            <Button
+                                variant="primary"
+                                onClick={() => {
+                                    setEditingRound(null);
+                                    setShowModalRound(true);
+                                }}
+                            >
+                                Добавить тур
+                            </Button>
+                            <Button variant="outline-warning" onClick={deleteCategory}>Удалить категорию</Button>
+                        </div>
+                    )}
+                </Card>
+
+                <Container className="mt-4">
+                    <Outlet />
+                </Container>
+
+                <RoundModal
+                    show={showModalRound}
+                    onHide={() => {
+                        setShowModalRound(false);
+                        setEditingRound(null);
+                    }}
+                    round={editingRound}
+                    categoryId={categoryId}
+                    onSave={fetchRounds}
+                />
+            </Container>
+        </RoundsContext.Provider>
     );
 };
 

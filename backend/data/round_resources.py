@@ -80,7 +80,6 @@ class RoundResource(Resource):
             return jsonify({'error': 'Invalid datetime format'}), 400
 
         round.name = data.get('name')
-        round.category_id = data.get('category_id')
         round.date = date
         session.commit()
 
