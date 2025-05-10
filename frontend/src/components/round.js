@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Button, Spinner, Container, Alert, Table } from "react-bootstrap";
+import {Button, Spinner, Container, Alert, Table, Dropdown} from "react-bootstrap";
 import { getUserInfo, isAdmin, isAuthenticated } from "./auth";
 import { useHelmetTitle } from "../hooks/indexHooks";
 import RoundsContext from "../contexts/RoundsContext";
 import RoundModal from "./add_edit_round";
-import GameModal from "./add_edit_game";  // Модалка для работы с играми
+import GameModal from "./add_edit_game";
 import axios from "../instances/axiosInstance";
 
 const Round = () => {
@@ -14,6 +14,7 @@ const Round = () => {
     const creator_id = userInfo ? Number(userInfo.id) : null;
     const { roundId } = useParams();
     const navigate = useNavigate();
+    const [showDropdown, setShowDropdown] = useState(false);
 
     const [round, setRound] = useState(null);
     const [games, setGames] = useState([]);
@@ -86,66 +87,70 @@ const Round = () => {
 
     return (
         <Container className="mt-4">
-            <h2>{round.name} Начало: {new Date(round.date).toLocaleString('ru-RU', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit' })}</h2>
+            <div className="d-flex align-items-start gap-2 mt-3">
+                <h3 className="mb-0">{round.name} Начало: {new Date(round.date).toLocaleString('ru-RU', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit' })}</h3>
+                {(((creator_id && creator_id === round.creator_id) && isAuthenticated()) || isAdmin()) && (
+                    <Dropdown show={showDropdown} onToggle={() => setShowDropdown(!showDropdown)}>
+                        <Dropdown.Toggle variant="warning" className="text-light border-0"></Dropdown.Toggle>
+                        <Dropdown.Menu>
+                            <>
+                                <Dropdown.Item onClick={() => {
+                                    setEditingRound(round);
+                                    setShowModalRound(true);
+                                }}>
+                                    Изменить
+                                </Dropdown.Item>
+                                <Dropdown.Item className="text-warning" onClick={deleteRound}>Удалить</Dropdown.Item>
+                            </>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                )}
+            </div>
 
-            {(((creator_id && creator_id === round.creator_id) && isAuthenticated()) || isAdmin()) && (
-                <div className="d-flex gap-2 mt-2">
-                    <Button
-                        variant="primary"
-                        onClick={() => {
-                            setEditingRound(round);
-                            setShowModalRound(true);
-                        }}
-                    >
-                        Изменить
-                    </Button>
-                    <Button variant="outline-warning" onClick={deleteRound}>Удалить</Button>
-                </div>
-            )}
-
-            <h3 className="mt-4">Игры:</h3>
             <Table striped bordered hover className="mt-3">
-                <thead>
-                <tr>
-                    <th>Доска</th>
-                    <th>Белые</th>
-                    <th>Черные</th>
-                    <th>Результат</th>
-                    {(((creator_id && creator_id === round.creator_id) && isAuthenticated()) || isAdmin()) && (
-                        <th>Действия</th>
-                    )}
-                </tr>
-                </thead>
-                <tbody>
-                {games.map(game => (
-                    <tr key={game.id}>
-                        <td>{game.board}</td>
-                        <td>{game.white_player}</td>
-                        <td>{game.black_player}</td>
-                        <td>{game.result}</td>
+                <thead className="table-primary">
+                    <tr>
+                        <th>Доска</th>
+                        <th>Белые</th>
+                        <th>Результат</th>
+                        <th>Черные</th>
                         {(((creator_id && creator_id === round.creator_id) && isAuthenticated()) || isAdmin()) && (
-                            <td>
-                                <Button
-                                    variant="outline-primary"
-                                    onClick={() => {
-                                        setEditingGame(game);
-                                        setShowModalGame(true);
-                                    }}
-                                >
-                                    Редактировать
-                                </Button>
-                                <Button variant="outline-warning" onClick={() => deleteGame(game.id)}>Удалить</Button>
-                            </td>
+                            <th>Действия</th>
                         )}
                     </tr>
-                ))}
+                </thead>
+                <tbody className="table-warning">
+                    {games.map(game => (
+                        <tr key={game.id}>
+                            <td>{game.board}</td>
+                            <td>{game.white_player}</td>
+                            <td>{game.result}</td>
+                            <td>{game.black_player}</td>
+                            {(((creator_id && creator_id === round.creator_id) && isAuthenticated()) || isAdmin()) && (
+                                <td>
+                                    <Button
+                                        className="me-2"
+                                        variant="outline-primary"
+                                        onClick={() => {
+                                            setEditingGame(game);
+                                            setShowModalGame(true);
+                                        }}
+                                    >
+                                        Редактировать
+                                    </Button>
+                                    <Button variant="outline-warning" onClick={() => deleteGame(game.id)}>Удалить</Button>
+                                </td>
+                            )}
+                        </tr>
+                    ))}
                 </tbody>
             </Table>
+
             {(((creator_id && creator_id === round.creator_id) && isAuthenticated()) || isAdmin()) && (
                 <div className="d-flex gap-2 mt-2">
                     <Button
