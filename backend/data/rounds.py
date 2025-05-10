@@ -9,10 +9,12 @@ class Round(SqlAlchemyBase, SerializerMixin):
     __tablename__ = 'rounds'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-    category_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("categories.id"))
+    category_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("categories.id"), nullable=False)
     name = sqlalchemy.Column(sqlalchemy.String(255), nullable=False)
     date = sqlalchemy.Column(sqlalchemy.DateTime, nullable=False)
+
     category = orm.relationship('Category', back_populates='rounds')
+    games = orm.relationship('Game', back_populates='round', cascade="all, delete-orphan")
 
 
     def to_dict(self, only=None):

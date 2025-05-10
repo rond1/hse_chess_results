@@ -10,7 +10,7 @@ from flask_jwt_extended import create_access_token, JWTManager, jwt_required, ge
 from flask_wtf.csrf import CSRFProtect
 
 from data.__all_models import *
-from data import user_resources, tournament_resources, category_resources, round_resources
+from data import user_resources, tournament_resources, category_resources, round_resources, game_resources
 from forms.login import LoginForm
 from forms.user import RegisterForm
 from data import db_session
@@ -173,12 +173,14 @@ def main():
     api.add_resource(tournament_resources.TournamentListResource, '/api/tournaments')
     api.add_resource(category_resources.CategoryListResource, '/api/categories')
     api.add_resource(round_resources.RoundListResource, '/api/rounds')
+    api.add_resource(game_resources.GameListResource, '/api/games')
 
     # для одного объекта
     api.add_resource(user_resources.UserResource, "/api/users/<int:user_id>")
     api.add_resource(tournament_resources.TournamentResource, "/api/tournaments/<int:tournament_id>")
     api.add_resource(category_resources.CategoryResource, '/api/categories/<int:category_id>')
     api.add_resource(round_resources.RoundResource, '/api/rounds/<int:round_id>')
+    api.add_resource(game_resources.GameResource, '/api/games/<int:game_id>')
 
     app.run(host="0.0.0.0", port=5000, debug=True)
 

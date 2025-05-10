@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useCallback, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Button, Spinner, Container, Alert } from "react-bootstrap";
+import { Button, Spinner, Container, Alert, Table } from "react-bootstrap";
 import { getUserInfo, isAdmin, isAuthenticated } from "./auth";
 import { useHelmetTitle } from "../hooks/indexHooks";
 import RoundsContext from "../contexts/RoundsContext";
-import RoundModal from "./add_edit_round"
+import RoundModal from "./add_edit_round";
+import GameModal from "./add_edit_game";  // Модалка для работы с играми
 import axios from "../instances/axiosInstance";
 
 const Round = () => {
@@ -15,9 +16,13 @@ const Round = () => {
     const navigate = useNavigate();
 
     const [round, setRound] = useState(null);
+    const [games, setGames] = useState([]);
     const [loadingRound, setLoadingRound] = useState(true);
+    const [loadingGames, setLoadingGames] = useState(true);
     const [error, setError] = useState(null);
     const [showModalRound, setShowModalRound] = useState(false);
+    const [showModalGame, setShowModalGame] = useState(false);
+    const [editingGame, setEditingGame] = useState(null);
     const [editingRound, setEditingRound] = useState(null);
 
     const { fetchRounds } = useContext(RoundsContext);
@@ -33,23 +38,41 @@ const Round = () => {
         }
     }, [roundId]);
 
+    const fetchGames = useCallback(async () => {
+        try {
+            const response = await axios.get(`/games?round_id=${roundId}`);
+            setGames(response.data);
+        } catch (error) {
+            setError("Ошибка загрузки игр");
+        } finally {
+            setLoadingGames(false);
+        }
+    }, [roundId]);
+
     useEffect(() => {
         fetchRound();
-    }, [fetchRound]);
+        fetchGames();
+    }, [fetchRound, fetchGames]);
 
     const deleteRound = () => {
         if (window.confirm("Вы уверены, что хотите удалить тур?")) {
-            axios.delete(`/rounds/${roundId}`, {
-                data: { salt: salt }
-            })
+            axios.delete(`/rounds/${roundId}`, { data: { salt: salt } })
                 .then(() => navigate(`/categories/${round?.category_id}`))
                 .catch(error => console.error("Ошибка удаления тура:", error));
         }
     };
 
+    const deleteGame = (gameId) => {
+        if (window.confirm("Вы уверены, что хотите удалить игру?")) {
+            axios.delete(`/games/${gameId}`, { data: { salt: salt } })
+                .then(() => fetchGames())
+                .catch(error => console.error("Ошибка удаления игры:", error));
+        }
+    };
+
     useHelmetTitle(round ? round.name : "Тур");
 
-    if (loadingRound) {
+    if (loadingRound || loadingGames) {
         return <Spinner animation="border" />;
     }
 
@@ -68,8 +91,8 @@ const Round = () => {
                 month: '2-digit',
                 year: 'numeric',
                 hour: '2-digit',
-                minute: '2-digit' })}
-            </h2>
+                minute: '2-digit' })}</h2>
+
             {(((creator_id && creator_id === round.creator_id) && isAuthenticated()) || isAdmin()) && (
                 <div className="d-flex gap-2 mt-2">
                     <Button
@@ -84,6 +107,69 @@ const Round = () => {
                     <Button variant="outline-warning" onClick={deleteRound}>Удалить</Button>
                 </div>
             )}
+
+            <h3 className="mt-4">Игры:</h3>
+            <Table striped bordered hover className="mt-3">
+                <thead>
+                <tr>
+                    <th>Доска</th>
+                    <th>Белые</th>
+                    <th>Черные</th>
+                    <th>Результат</th>
+                    {(((creator_id && creator_id === round.creator_id) && isAuthenticated()) || isAdmin()) && (
+                        <th>Действия</th>
+                    )}
+                </tr>
+                </thead>
+                <tbody>
+                {games.map(game => (
+                    <tr key={game.id}>
+                        <td>{game.board}</td>
+                        <td>{game.white_player}</td>
+                        <td>{game.black_player}</td>
+                        <td>{game.result}</td>
+                        {(((creator_id && creator_id === round.creator_id) && isAuthenticated()) || isAdmin()) && (
+                            <td>
+                                <Button
+                                    variant="outline-primary"
+                                    onClick={() => {
+                                        setEditingGame(game);
+                                        setShowModalGame(true);
+                                    }}
+                                >
+                                    Редактировать
+                                </Button>
+                                <Button variant="outline-warning" onClick={() => deleteGame(game.id)}>Удалить</Button>
+                            </td>
+                        )}
+                    </tr>
+                ))}
+                </tbody>
+            </Table>
+            {(((creator_id && creator_id === round.creator_id) && isAuthenticated()) || isAdmin()) && (
+                <div className="d-flex gap-2 mt-2">
+                    <Button
+                        variant="primary"
+                        onClick={() => {
+                            setEditingGame(null);
+                            setShowModalGame(true);
+                        }}
+                    >
+                        Добавить игру
+                    </Button>
+                </div>
+            )}
+
+            <GameModal
+                show={showModalGame}
+                onHide={() => setShowModalGame(false)}
+                game={editingGame}
+                roundId={roundId}
+                onSave={() => {
+                    fetchGames();
+                }}
+            />
+
             <RoundModal
                 show={showModalRound}
                 onHide={() => {
