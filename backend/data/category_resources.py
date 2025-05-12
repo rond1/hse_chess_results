@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from flask import jsonify, request
+from flask import request
 from flask_restful import abort, Resource
 
 from data import db_session
@@ -21,20 +21,20 @@ class CategoryListResource(Resource):
         if tournament_id:
             query = query.filter(Category.tournament_id == tournament_id)
         categories = query.all()
-        return jsonify([
+        return [
             category.to_dict(only=('id', 'name', 'tournament_id'))
             for category in categories
-        ])
+        ]
 
 
     def post(self):
         data = request.get_json(force=True)
 
         if data.get('salt') != salt:
-            return jsonify({'error': 'unsalted'}), 400
+            return {'error': 'unsalted'}, 400
 
         if not data.get('name'):
-            return jsonify({'error': 'Invalid name'}), 400
+            return {'error': 'Invalid name'}, 400
 
         if 'name' in data and data['name'] and 'tournament_id' in data and data['tournament_id']:
             session = db_session.create_session()
@@ -44,9 +44,9 @@ class CategoryListResource(Resource):
             )
             session.add(category)
             session.commit()
-            return jsonify({'success': 'OK'})
+            return {'success': 'OK'}
 
-        return jsonify({'errors': 'Ошибка валидации'}), 400
+        return {'errors': 'Ошибка валидации'}, 400
 
 
 class CategoryResource(Resource):
@@ -54,31 +54,30 @@ class CategoryResource(Resource):
         abort_if_categories_not_found(category_id)
         session = db_session.create_session()
         category = session.query(Category).get(category_id)
-        return jsonify(category.to_dict(
+        return category.to_dict(
             only=('name', 'tournament_id', 'creator_id')
-        ))
+        )
 
     def put(self, category_id):
+        abort_if_categories_not_found(category_id)
         data = request.get_json(force=True)
 
         if data.get('salt') != salt:
-            return jsonify({'error': 'unsalted'}), 400
+            return {'error': 'unsalted'}, 400
 
         session = db_session.create_session()
         category = session.query(Category).get(category_id)
-        if not category:
-            abort(404, message=f"Category {category_id} not found")
 
         category.name = data.get('name')
         session.commit()
 
-        return jsonify({'success': 'OK'})
+        return {'success': 'OK'}
 
     def delete(self, category_id):
         data = request.get_json(force=True)
 
         if data.get('salt') != salt:
-            return jsonify({'error': 'unsalted'}), 400
+            return {'error': 'unsalted'}, 400
 
         abort_if_categories_not_found(category_id)
         session = db_session.create_session()
@@ -88,5 +87,5 @@ class CategoryResource(Resource):
             session.commit()
         except SQLAlchemyError as e:
             session.rollback()
-            return jsonify({'error': str(e)}), 500
-        return jsonify({'success': 'OK'})
+            return {'error': str(e)}, 500
+        return {'success': 'OK'}

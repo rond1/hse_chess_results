@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from flask import jsonify, request
+from flask import request
 from flask_restful import abort, Resource
 import chess.pgn
 
@@ -35,32 +35,32 @@ class GameListResource(Resource):
         if round_id:
             query = query.filter(Game.round_id == round_id).order_by(Game.board)
         games = query.all()
-        return jsonify([
+        return [
             game.to_dict(only=(
                 'id', 'board', 'white_player', 'black_player', 'result', 'round_id', 'moves'
             )) for game in games
-        ])
+        ]
 
 
     def post(self):
         data = request.get_json(force=True)
 
         if data.get('salt') != salt:
-            return jsonify({'error': 'unsalted'}), 400
+            return {'error': 'unsalted'}, 400
 
         required_fields = ['round_id', 'board', 'white_player', 'black_player']
         if not all(data.get(field) for field in required_fields):
-            return jsonify({'error': 'Пропущены обязательные поля'}), 400
+            return {'error': 'Пропущены обязательные поля'}, 400
 
         if 'moves' in data:
             valid, error_message = validate_moves(data['moves'])
             if not valid:
-                return jsonify({'error': error_message}), 400
+                return {'error': error_message}, 400
 
         session = db_session.create_session()
         existing_game = session.query(Game).filter_by(round_id=data['round_id'], board=data['board']).first()
         if existing_game:
-            return jsonify({"error": "Доска с таким номером уже существует в этом туре"}), 400
+            return {"error": "Доска с таким номером уже существует в этом туре"}, 400
 
         game = Game(
             round_id=data['round_id'],
@@ -74,8 +74,8 @@ class GameListResource(Resource):
             session.commit()
         except SQLAlchemyError as e:
             session.rollback()
-            return jsonify({'error': str(e)}), 500
-        return jsonify({'success': 'OK'})
+            return {'error': str(e)}, 500
+        return {'success': 'OK'}
 
 
 class GameResource(Resource):
@@ -83,9 +83,9 @@ class GameResource(Resource):
         abort_if_game_not_found(game_id)
         session = db_session.create_session()
         game = session.query(Game).get(game_id)
-        return jsonify(game.to_dict(only=(
+        return game.to_dict(only=(
             'id', 'board', 'white_player', 'black_player', 'result', 'round_id', 'moves'
-        )))
+        ))
 
 
     def put(self, game_id):
@@ -93,7 +93,7 @@ class GameResource(Resource):
         data = request.get_json(force=True)
 
         if data.get('salt') != salt:
-            return jsonify({'error': 'unsalted'}), 400
+            return {'error': 'unsalted'}, 400
 
         session = db_session.create_session()
         game = session.query(Game).get(game_id)
@@ -101,12 +101,12 @@ class GameResource(Resource):
         if 'moves' in data:
             valid, error_message = validate_moves(data['moves'])
             if not valid:
-                return jsonify({'error': error_message}), 400
+                return {'error': error_message}, 400
 
         if data['board'] != game.board:
             existing_game = session.query(Game).filter_by(round_id=game.round_id, board=data['board']).first()
             if existing_game and existing_game.id != game_id:
-                return jsonify({"error": "Доска с таким номером уже существует в этом туре"}), 400
+                return {"error": "Доска с таким номером уже существует в этом туре"}, 400
 
         for field in ['board', 'white_player', 'black_player', 'result']:
             if field in data:
@@ -116,8 +116,8 @@ class GameResource(Resource):
             session.commit()
         except SQLAlchemyError as e:
             session.rollback()
-            return jsonify({'error': str(e)}), 500
-        return jsonify({'success': 'OK'})
+            return {'error': str(e)}, 500
+        return {'success': 'OK'}
 
 
     def delete(self, game_id):
@@ -129,5 +129,5 @@ class GameResource(Resource):
             session.commit()
         except SQLAlchemyError as e:
             session.rollback()
-            return jsonify({'error': str(e)}), 500
-        return jsonify({'success': 'OK'})
+            return {'error': str(e)}, 500
+        return {'success': 'OK'}

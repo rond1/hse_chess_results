@@ -1,7 +1,7 @@
 import datetime
 
 from sqlalchemy.exc import SQLAlchemyError
-from flask import jsonify, request
+from flask import request
 from flask_restful import abort, Resource
 
 from data import db_session
@@ -24,25 +24,25 @@ class RoundListResource(Resource):
         if category_id:
             query = query.filter(Round.category_id == category_id)
         rounds = query.all()
-        return jsonify([
+        return [
             round.to_dict(only=('id', 'name', 'category_id', 'date'))
             for round in rounds
-        ])
+        ]
 
 
     def post(self):
         data = request.get_json(force=True)
 
         if data.get('salt') != salt:
-            return jsonify({'error': 'unsalted'}), 400
+            return {'error': 'unsalted'}, 400
 
         if not data.get('name') or not data.get('category_id') or not data.get('date'):
-            return jsonify({'error': 'Invalid data'}), 400
+            return {'error': 'Invalid data'}, 400
 
         try:
             date = datetime.datetime.strptime(data['date'], '%Y-%m-%dT%H:%M')
         except (KeyError, ValueError):
-            return jsonify({'error': 'Invalid datetime format'}), 400
+            return {'error': 'Invalid datetime format'}, 400
 
         session = db_session.create_session()
         round = Round(
@@ -52,7 +52,7 @@ class RoundListResource(Resource):
         )
         session.add(round)
         session.commit()
-        return jsonify({'success': 'OK'})
+        return {'success': 'OK'}
 
 
 class RoundResource(Resource):
@@ -60,30 +60,29 @@ class RoundResource(Resource):
         abort_if_round_not_found(round_id)
         session = db_session.create_session()
         round = session.query(Round).get(round_id)
-        return jsonify(round.to_dict(only=('id', 'name', 'category_id', 'date')))
+        return round.to_dict(only=('id', 'name', 'category_id', 'date', 'creator_id'))
 
 
     def put(self, round_id):
+        abort_if_round_not_found(round_id)
         data = request.get_json(force=True)
 
         if data.get('salt') != salt:
-            return jsonify({'error': 'unsalted'}), 400
+            return {'error': 'unsalted'}, 400
 
         session = db_session.create_session()
         round = session.query(Round).get(round_id)
-        if not round:
-            abort(404, message=f"Round {round_id} not found")
 
         try:
             date = datetime.datetime.strptime(data['date'], '%Y-%m-%dT%H:%M')
         except (KeyError, ValueError):
-            return jsonify({'error': 'Invalid datetime format'}), 400
+            return {'error': 'Invalid datetime format'}, 400
 
         round.name = data.get('name')
         round.date = date
         session.commit()
 
-        return jsonify({'success': 'OK'})
+        return {'success': 'OK'}
 
 
     def delete(self, round_id):
@@ -95,5 +94,5 @@ class RoundResource(Resource):
             session.commit()
         except SQLAlchemyError as e:
             session.rollback()
-            return jsonify({'error': str(e)}), 500
-        return jsonify({'success': 'OK'})
+            return {'error': str(e)}, 500
+        return {'success': 'OK'}

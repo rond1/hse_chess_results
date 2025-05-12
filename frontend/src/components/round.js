@@ -129,7 +129,9 @@ const Round = () => {
                 )}
             </div>
 
-            <PgnUploader roundId={roundId} onSuccess={fetchGames} />
+            {(((creator_id && creator_id === round.creator_id) && isAuthenticated()) || isAdmin()) && (
+                <PgnUploader roundId={roundId} onSuccess={fetchGames} />
+            )}
 
             <Table striped bordered hover className="mt-3">
                 <thead className="table-primary">
