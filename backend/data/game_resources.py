@@ -1,4 +1,3 @@
-import datetime
 from sqlalchemy.exc import SQLAlchemyError
 from flask import jsonify, request
 from flask_restful import abort, Resource
@@ -37,7 +36,12 @@ class GameListResource(Resource):
 
         required_fields = ['round_id', 'board', 'white_player', 'black_player']
         if not all(data.get(field) for field in required_fields):
-            return jsonify({'error': 'Missing required fields'}), 400
+            return jsonify({'error': 'Пропущены обязательные поля'}), 400
+
+        session = db_session.create_session()
+        existing_game = session.query(Game).filter_by(round_id=data['round_id'], board=data['board']).first()
+        if existing_game:
+            return jsonify({"error": "Доска с таким номером уже существует в этом туре"}), 400
 
         game = Game(
             round_id=data['round_id'],
@@ -46,7 +50,6 @@ class GameListResource(Resource):
             black_player=data['black_player'],
             result=data.get('result')
         )
-        session = db_session.create_session()
         session.add(game)
         try:
             session.commit()
@@ -66,6 +69,7 @@ class GameResource(Resource):
         )))
 
     def put(self, game_id):
+        abort_if_game_not_found(game_id)
         data = request.get_json(force=True)
 
         if data.get('salt') != salt:
@@ -73,8 +77,10 @@ class GameResource(Resource):
 
         session = db_session.create_session()
         game = session.query(Game).get(game_id)
-        if not game:
-            abort(404, message=f"Game {game_id} not found")
+        if data['board'] != game.board:
+            existing_game = session.query(Game).filter_by(round_id=game.round_id, board=data['board']).first()
+            if existing_game and existing_game.id != game_id:
+                return jsonify({"error": "Доска с таким номером уже существует в этом туре"}), 400
 
         for field in ['board', 'white_player', 'black_player', 'result']:
             if field in data:

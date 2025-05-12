@@ -16,6 +16,9 @@ class Game(SqlAlchemyBase, SerializerMixin):
     result = sqlalchemy.Column(sqlalchemy.String(5), nullable=True)
 
     round = orm.relationship('Round', back_populates='games')
+    __table_args__ = (
+        sqlalchemy.UniqueConstraint('round_id', 'board', name='unique_board_per_round'),
+    )
 
     def to_dict(self, only=None):
         data = {

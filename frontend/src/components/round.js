@@ -6,6 +6,7 @@ import { useHelmetTitle } from "../hooks/indexHooks";
 import RoundsContext from "../contexts/RoundsContext";
 import RoundModal from "./add_edit_round";
 import GameModal from "./add_edit_game";
+import PgnUploader from "./pgn";
 import axios from "../instances/axiosInstance";
 
 const Round = () => {
@@ -111,6 +112,8 @@ const Round = () => {
                     </Dropdown>
                 )}
             </div>
+
+            <PgnUploader roundId={roundId} onSuccess={fetchGames} />
 
             <Table striped bordered hover className="mt-3">
                 <thead className="table-primary">
