@@ -1,29 +1,21 @@
-[Event "Классическая партия"]
-[Site "Шахматный урок"]
-[Date "2023.10.01"]
-[Round "1"]
-[White "Легаль"]
-[Black "Студент"]
-[Result "1-0"]
+[Event "Rated blitz game"]
+[Site "https://lichess.org/Jnix8YPg"]
+[Date "2025.05.11"]
+[White "ErnarKydyrbekov"]
+[Black "suhrobdomoi"]
+[Result "0-1"]
+[GameId "Jnix8YPg"]
+[UTCDate "2025.05.11"]
+[UTCTime "08:10:18"]
+[WhiteElo "1120"]
+[BlackElo "1152"]
+[WhiteRatingDiff "-5"]
+[BlackRatingDiff "+5"]
+[Variant "Standard"]
+[TimeControl "180+2"]
+[ECO "A03"]
+[Opening "Bird Opening: Dutch Variation"]
+[Termination "Normal"]
+[Annotator "lichess.org"]
 
-1. e4 e5 2. Bc4 d6 3. Nf3 Bg4 4. Nc3 g6 5. Nxe5 Bxd1 6. Bxf7+ Ke7 7. Nd5# 1-0
-
-[Event "Классическая партия"]
-[Site "Шахматный урок"]
-[Date "2023.10.01"]
-[Round "1"]
-[White "Алексей"]
-[Black "Сергей"]
-[Result "1-0"]
-
-1. e4 e5 2. Bc4 Nc6 3. Qh5 Nf6 4. Qxf7# 1-0
-
-[Event "Классическая партия"]
-[Site "Шахматный урок"]
-[Date "2023.10.01"]
-[Round "1"]
-[White "Адольф Андерсен"]
-[Black "Людвиг Кизеритцкий"]
-[Result "1-0"]
-
-1. e4 e5 2. f4 exf4 3. Bc4 Qh5+ 4. Kd1 b5 5. Bxb5 Nf6 6. Nf3 Qh6 7. d3 Nh5 8. Nh4 Qg5 9. Nf5 c6 10. g4 Nf6 11. Rg1 cxb5 12. h4 Qg6 13. h5 Qg5 14. Qf3 Ng8 15. Bxf4 Qf6 16. Nc3 Bc5 17. Nd5 Qd8 18. Nxe7 Kd7 19. Qxf7+ Nxf7 20. Bd6 Qe8 21. Bxc5 d6 22. Bxd6 Qe6 23. Bxf8 Rxf8 24. Qg7 Rd8 25. Qxh7 Bxg2 26. Qg6 Bxf1 27. Rxf1 Qd6 28. Nf5 Qa3 29. Nc7 Kxc7 30. Rc1+ Kb8 31. Qxb5+ Ka8 32. Qa5+ Kb8 33. Qb6+ Ka8 34. Rg1 1-0
+1. f4 { [%clk 0:03:00] } 1... d5 { [%clk 0:03:00] } { A03 Bird Opening: Dutch Variation } 2. Nf3 { [%clk 0:02:57] } 2... Nf6 { [%clk 0:02:59] } 3. g3 { [%clk 0:02:58] } 3... Bf5 { [%clk 0:03:00] } 4. Bg2 { [%clk 0:02:59] } 4... Qd6 { [%clk 0:03:01] } 5. d3 { [%clk 0:02:57] } 5... c5 { [%clk 0:03:01] } 6. Nbd2 { [%clk 0:02:53] } 6... Nc6 { [%clk 0:03:02] } 7. e4 { [%clk 0:02:49] } 7... dxe4 { [%clk 0:03:02] } 8. dxe4 { [%clk 0:02:49] } 8... Nxe4 { [%clk 0:03:03] } 9. O-O { [%clk 0:02:48] } 9... O-O-O { [%clk 0:02:56] } 10. Nxe4 { [%clk 0:02:48] } 10... Bxe4 { [%clk 0:02:56] } 11. Qxd6 { [%clk 0:02:48] } 11... Rxd6 { [%clk 0:02:58] } 12. Ng5 { [%clk 0:02:46] } 12... Bg6 { [%clk 0:02:44] } 13. Bxc6 { [%clk 0:02:44] } 13... Rxc6 { [%clk 0:02:46] } 14. c3 { [%clk 0:02:35] } 14... f6 { [%clk 0:02:31] } 15. Nf3 { [%clk 0:02:29] } 15... e6 { [%clk 0:02:29] } 16. Be3 { [%clk 0:02:28] } 16... c4 { [%clk 0:02:22] } 17. Bxa7 { [%clk 0:02:26] } 17... b6 { [%clk 0:02:22] } 18. Rad1 { [%clk 0:02:21] } 18... Bd3 { [%clk 0:02:08] } 19. Nd4 { [%clk 0:02:07] } 19... Rd6 { [%clk 0:02:03] } 20. Rfe1 { [%clk 0:02:02] } 20... Kb7 { [%clk 0:02:01] } 21. Nb5 { [%clk 0:01:59] } 21... Rd5 { [%clk 0:01:50] } 22. a4 { [%clk 0:01:49] } 22... Bc5+ { [%clk 0:01:30] } 23. Kg2 { [%clk 0:01:47] } 23... Ra8 { [%clk 0:01:20] } 24. Rxe6 { [%clk 0:01:43] } 24... Rxa7 { [%clk 0:01:12] } 25. Nxa7 { [%clk 0:01:42] } 25... Kxa7 { [%clk 0:01:14] } 26. Rc6 { [%clk 0:01:35] } 26... Bf1+ { [%clk 0:01:12] } 27. Rxf1 { [%clk 0:01:25] } 27... Rd2+ { [%clk 0:01:13] } 28. Kh3 { [%clk 0:01:21] } 28... Rxb2 { [%clk 0:01:10] } 29. Rc7+ { [%clk 0:01:22] } 29... Ka6 { [%clk 0:01:11] } 30. Rxg7 { [%clk 0:01:21] } 30... h5 { [%clk 0:01:11] } 31. Rg8 { [%clk 0:01:06] } 31... b5 { [%clk 0:01:08] } 32. Ra8+ { [%clk 0:01:02] } 32... Kb6 { [%clk 0:01:07] } 33. axb5 { [%clk 0:00:58] } 33... Kxb5 { [%clk 0:01:07] } 34. Rb8+ { [%clk 0:00:58] } 34... Bb6 { [%clk 0:01:07] } 35. Kh4 { [%clk 0:00:53] } 35... Rxh2# { [%clk 0:01:02] } { Black wins by checkmate. } 0-1

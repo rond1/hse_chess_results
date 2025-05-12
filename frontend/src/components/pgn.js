@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Alert, Spinner } from 'react-bootstrap';
 import axios from 'axios';
@@ -7,6 +7,16 @@ const PgnUploader = ({ roundId, onSuccess }) => {
     const salt = process.env.REACT_APP_SALT;
     const [uploading, setUploading] = useState(false);
     const [alert, setAlert] = useState(null);
+
+    useEffect(() => {
+        if (alert) {
+            const timer = setTimeout(() => {
+                setAlert(null);
+            }, 500);
+
+            return () => clearTimeout(timer);
+        }
+    }, [alert]);
 
     const onDrop = useCallback(async (acceptedFiles) => {
         if (!acceptedFiles.length) return;

@@ -8,6 +8,7 @@ const GameModal = ({ show, onHide, game, roundId, onSave }) => {
     const [whitePlayer, setWhitePlayer] = useState("");
     const [blackPlayer, setBlackPlayer] = useState("");
     const [result, setResult] = useState("");
+    const [movesText, setMovesText] = useState("");
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
 
@@ -17,6 +18,7 @@ const GameModal = ({ show, onHide, game, roundId, onSave }) => {
             setWhitePlayer(game?.white_player || "");
             setBlackPlayer(game?.black_player || "");
             setResult(game?.result || "");
+            setMovesText(game?.moves || "");
             setError("");
         }
     }, [show, game]);
@@ -29,10 +31,10 @@ const GameModal = ({ show, onHide, game, roundId, onSave }) => {
 
         const request = game
             ? axios.put(`/games/${game.id}`, {
-                board: board, white_player: whitePlayer, black_player: blackPlayer, result: result, salt: salt
+                board: board, white_player: whitePlayer, black_player: blackPlayer, result: result, salt: salt, moves: movesText
             })
             : axios.post(`/games`, {
-                board: board, white_player: whitePlayer, black_player: blackPlayer, result: result, round_id: roundId, salt: salt
+                board: board, white_player: whitePlayer, black_player: blackPlayer, result: result, round_id: roundId, salt: salt, moves: movesText
             });
 
         request
@@ -44,7 +46,7 @@ const GameModal = ({ show, onHide, game, roundId, onSave }) => {
                 setError("Не удалось сохранить партию. Попробуйте еще раз.");
             })
             .finally(() => setSaving(false));
-    }, [game, board, whitePlayer, blackPlayer, result, roundId, onSave, onHide, salt]);
+    }, [game, board, whitePlayer, blackPlayer, result, roundId, onSave, onHide, salt, movesText]);
 
     return (
         <Modal show={show} onHide={onHide}>
@@ -98,6 +100,17 @@ const GameModal = ({ show, onHide, game, roundId, onSave }) => {
                             <option value="0-1">0 - 1</option>
                             <option value="½-½">½ - ½</option>
                         </Form.Select>
+                    </Form.Group>
+                    <Form.Group className="mb-3" controlId="moves">
+                        <Form.Label>Ходы (вставьте формат SAN)</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            rows={4}
+                            value={movesText}
+                            onChange={(e) => setMovesText(e.target.value)}
+                            placeholder="Введите ходы (например, e2 e4 e7 e5 или e2-e4 e7-e5)"
+                            disabled={saving}
+                        />
                     </Form.Group>
                 </Form>
             </Modal.Body>

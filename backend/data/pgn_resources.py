@@ -41,7 +41,14 @@ class PGNUploadResource(Resource):
             white = game.headers["White"]
             black = game.headers["Black"]
             result = game.headers["Result"]
-            print(white, black, result)
+
+            moves_san = []
+            node = game
+            while node.variations:
+                next_node = node.variations[0]
+                moves_san.append(node.board().san(next_node.move))
+                node = next_node
+            moves_str = ' '.join(moves_san)
 
             existing = session.query(Game).filter_by(round_id=round_id, board=board_number).first()
             while existing:
@@ -53,7 +60,8 @@ class PGNUploadResource(Resource):
                 board=board_number,
                 white_player=white,
                 black_player=black,
-                result=result
+                result=result,
+                moves=moves_str
             )
             session.add(db_game)
             board_number += 1

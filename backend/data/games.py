@@ -14,6 +14,7 @@ class Game(SqlAlchemyBase, SerializerMixin):
     white_player = sqlalchemy.Column(sqlalchemy.String(255), nullable=False)
     black_player = sqlalchemy.Column(sqlalchemy.String(255), nullable=False)
     result = sqlalchemy.Column(sqlalchemy.String(5), nullable=True)
+    moves = sqlalchemy.Column(sqlalchemy.Text(300), nullable=True)
 
     round = orm.relationship('Round', back_populates='games')
     __table_args__ = (
@@ -27,6 +28,7 @@ class Game(SqlAlchemyBase, SerializerMixin):
             "white_player": self.white_player,
             "black_player": self.black_player,
             "result": self.result,
-            "round_id": self.round_id
+            "round_id": self.round_id,
+            "moves": self.moves
         }
         return {key: data[key] for key in only} if only else data

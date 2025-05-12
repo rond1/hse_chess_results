@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useContext } from "react";
+import React, { useEffect, useState, useCallback, useContext, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {Button, Spinner, Container, Alert, Table, Dropdown} from "react-bootstrap";
 import { getUserInfo, isAdmin, isAuthenticated } from "./auth";
@@ -7,6 +7,7 @@ import RoundsContext from "../contexts/RoundsContext";
 import RoundModal from "./add_edit_round";
 import GameModal from "./add_edit_game";
 import PgnUploader from "./pgn";
+import MovesModal from "./moves_modal";
 import axios from "../instances/axiosInstance";
 
 const Round = () => {
@@ -24,8 +25,18 @@ const Round = () => {
     const [error, setError] = useState(null);
     const [showModalRound, setShowModalRound] = useState(false);
     const [showModalGame, setShowModalGame] = useState(false);
+    const [showMovesModal, setShowMovesModal] = useState(false);
     const [editingGame, setEditingGame] = useState(null);
     const [editingRound, setEditingRound] = useState(null);
+    const [selectedGameMoves, setSelectedGameMoves] = useState("");
+
+    const showActions = useMemo(() => {
+        if (!round) return false;
+        return (
+            (((creator_id && creator_id === round.creator_id) && isAuthenticated()) || isAdmin()) ||
+            games.some(game => game.moves && game.moves.trim() !== "")
+        );
+    }, [creator_id, round, games]);
 
     const { fetchRounds } = useContext(RoundsContext);
 
@@ -86,6 +97,11 @@ const Round = () => {
         return <p>Тур не найден</p>;
     }
 
+    const handleViewMoves = (game) => {
+        setSelectedGameMoves(game.moves);
+        setShowMovesModal(true);
+    };
+
     return (
         <Container className="mt-4">
             <div className="d-flex align-items-start gap-2 mt-3">
@@ -122,7 +138,7 @@ const Round = () => {
                         <th>Белые</th>
                         <th>Результат</th>
                         <th>Черные</th>
-                        {(((creator_id && creator_id === round.creator_id) && isAuthenticated()) || isAdmin()) && (
+                        {showActions && (
                             <th>Действия</th>
                         )}
                     </tr>
@@ -134,19 +150,33 @@ const Round = () => {
                             <td>{game.white_player}</td>
                             <td>{game.result}</td>
                             <td>{game.black_player}</td>
-                            {(((creator_id && creator_id === round.creator_id) && isAuthenticated()) || isAdmin()) && (
+                            {showActions && (
                                 <td>
-                                    <Button
-                                        className="me-2"
-                                        variant="outline-primary"
-                                        onClick={() => {
-                                            setEditingGame(game);
-                                            setShowModalGame(true);
-                                        }}
-                                    >
-                                        Редактировать
-                                    </Button>
-                                    <Button variant="outline-warning" onClick={() => deleteGame(game.id)}>Удалить</Button>
+                                    <>
+                                        {(((creator_id && creator_id === round.creator_id) && isAuthenticated()) || isAdmin()) && (
+                                            <>
+                                                <Button
+                                                    className="me-2"
+                                                    variant="outline-dark"
+                                                    onClick={() => {
+                                                        setEditingGame(game);
+                                                        setShowModalGame(true);
+                                                    }}
+                                                >
+                                                    Редактировать
+                                                </Button>
+                                                <Button className="me-2" variant="outline-warning" onClick={() => deleteGame(game.id)}>Удалить</Button>
+                                            </>
+                                        )}
+                                        {game.moves && game.moves.trim() !== "" && (
+                                            <Button
+                                                variant="outline-primary"
+                                                onClick={() => handleViewMoves(game)}
+                                            >
+                                                Посмотреть партию
+                                            </Button>
+                                        )}
+                                    </>
                                 </td>
                             )}
                         </tr>
@@ -185,11 +215,17 @@ const Round = () => {
                     setEditingRound(null);
                 }}
                 round={editingRound}
-                categoryId={roundId}
+                categoryId={round.category_id}
                 onSave={() => {
                     fetchRound();
                     fetchRounds();
                 }}
+            />
+
+            <MovesModal
+                show={showMovesModal}
+                onHide={() => setShowMovesModal(false)}
+                moves={selectedGameMoves}
             />
         </Container>
     );
