@@ -30,16 +30,28 @@ def abort_if_game_not_found(game_id):
 class GameListResource(Resource):
     def get(self):
         round_id = request.args.get('round_id', type=int)
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 10, type=int)
+
         session = db_session.create_session()
         query = session.query(Game)
         if round_id:
-            query = query.filter(Game.round_id == round_id).order_by(Game.board)
-        games = query.all()
-        return [
-            game.to_dict(only=(
+            query = query.filter(Game.round_id == round_id)
+
+        query = query.order_by(Game.board)
+
+        total = query.count()
+        games = query.offset((page - 1) * per_page).limit(per_page).all()
+
+        return {
+            'games': [game.to_dict(only=(
                 'id', 'board', 'white_player', 'black_player', 'result', 'round_id', 'moves'
-            )) for game in games
-        ]
+            )) for game in games],
+            'total': total,
+            'page': page,
+            'pages': (total + per_page - 1) // per_page,
+            'per_page': per_page
+        }
 
 
     def post(self):

@@ -8,6 +8,7 @@ import RoundModal from "./add_edit_round";
 import GameModal from "./add_edit_game";
 import PgnUploader from "./pgn";
 import MovesModal from "./moves_modal";
+import CustomPagination from "./pagination";
 import axios from "../instances/axiosInstance";
 
 const Round = () => {
@@ -29,6 +30,9 @@ const Round = () => {
     const [editingGame, setEditingGame] = useState(null);
     const [editingRound, setEditingRound] = useState(null);
     const [selectedGameMoves, setSelectedGameMoves] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const gamesPerPage = 10;
 
     const showActions = useMemo(() => {
         if (!round) return false;
@@ -53,14 +57,21 @@ const Round = () => {
 
     const fetchGames = useCallback(async () => {
         try {
-            const response = await axios.get(`/games?round_id=${roundId}`);
-            setGames(response.data);
+            const response = await axios.get(`/games`, {
+                params: {
+                    round_id: roundId,
+                    page: currentPage,
+                    per_page: gamesPerPage
+                }
+            });
+            setGames(response.data.games);
+            setTotalPages(response.data.pages);
         } catch (error) {
             setError("Ошибка загрузки игр");
         } finally {
             setLoadingGames(false);
         }
-    }, [roundId]);
+    }, [roundId, currentPage]);
 
     useEffect(() => {
         fetchRound();
@@ -70,7 +81,7 @@ const Round = () => {
     const deleteRound = () => {
         if (window.confirm("Вы уверены, что хотите удалить тур?")) {
             axios.delete(`/rounds/${roundId}`, { data: { salt: salt } })
-                .then(() => navigate(`/categories/${round?.category_id}`))
+                .then(() => navigate(`/categories/${round?.category_id}`, { state: { refresh: true } }))
                 .catch(error => console.error("Ошибка удаления тура:", error));
         }
     };
@@ -185,6 +196,15 @@ const Round = () => {
                     ))}
                 </tbody>
             </Table>
+
+            <CustomPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(page) => {
+                    setCurrentPage(page);
+                    setLoadingGames(true);
+                }}
+            />
 
             {(((creator_id && creator_id === round.creator_id) && isAuthenticated()) || isAdmin()) && (
                 <div className="d-flex gap-2 mt-2">

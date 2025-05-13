@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams, useNavigate, Link, Outlet } from "react-router-dom";
+import { useParams, useNavigate, Link, Outlet, useLocation } from "react-router-dom";
 import { Card, Button, Spinner, Container, Alert } from "react-bootstrap";
 import { getUserInfo, isAdmin, isAuthenticated } from "./auth";
 import { useHelmetTitle } from "../hooks/indexHooks";
@@ -13,6 +13,7 @@ const Category = () => {
     const creator_id = userInfo ? Number(userInfo.id) : null;
     const { categoryId } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [category, setCategory] = useState(null);
     const [rounds, setRounds] = useState([]);
@@ -50,6 +51,13 @@ const Category = () => {
         fetchCategory();
         fetchRounds();
     }, [fetchCategory, fetchRounds]);
+
+    useEffect(() => {
+        if (location.state?.refresh) {
+            fetchRounds();
+            navigate(location.pathname, { replace: true, state: {} });
+        }
+    }, [location, fetchRounds, navigate]);
 
     const deleteCategory = () => {
         if (window.confirm("Вы уверены, что хотите удалить категорию?")) {

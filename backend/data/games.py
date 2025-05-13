@@ -13,7 +13,7 @@ class Game(SqlAlchemyBase, SerializerMixin):
     board = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
     white_player = sqlalchemy.Column(sqlalchemy.String(255), nullable=False)
     black_player = sqlalchemy.Column(sqlalchemy.String(255), nullable=False)
-    result = sqlalchemy.Column(sqlalchemy.String(5), nullable=True)
+    result = sqlalchemy.Column(sqlalchemy.String(8), nullable=True)
     moves = sqlalchemy.Column(sqlalchemy.Text(300), nullable=True)
 
     round = orm.relationship('Round', back_populates='games')
