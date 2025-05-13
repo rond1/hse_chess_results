@@ -17,12 +17,26 @@ def abort_if_tournaments_not_found(tournament_id):
 
 class TournamentListResource(Resource):
     def get(self):
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 10, type=int)
+
         session = db_session.create_session()
-        tournaments = session.query(Tournament).order_by(Tournament.is_finished, Tournament.start.desc()).all()
-        return [
-            tournament.to_dict(only=('id', 'name', 'game_time', 'move_time', 'start', 'is_finished', 'creator_id'))
-            for tournament in tournaments
-        ]
+        query = session.query(Tournament)
+        query = query.order_by(Tournament.is_finished, Tournament.start.desc())
+
+        total = query.count()
+        tournaments = query.offset((page - 1) * per_page).limit(per_page).all()
+
+        return {
+            'tournaments': [
+                tournament.to_dict(only=('id', 'name', 'game_time', 'move_time', 'start', 'is_finished', 'creator_id'))
+                for tournament in tournaments
+            ],
+            'total': total,
+            'page': page,
+            'pages': (total + per_page - 1) // per_page,
+            'per_page': per_page
+        }
 
 
     def post(self):

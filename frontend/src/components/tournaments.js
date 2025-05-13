@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import axios from "../instances/axiosInstance";
 import { ListGroup, Container, Spinner, Button, Alert } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import CustomPagination from "./pagination";
 import { useHelmetTitle } from "../hooks/indexHooks";
 
 const TournamentList = () => {
@@ -11,25 +12,35 @@ const TournamentList = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const tournamentsPerPage = 10;
+
     const handleError = (error) => {
         console.error(error);
         setError("Не удалось загрузить турниры. Попробуйте позже.");
     };
 
-    useEffect(() => {
-        const fetchTournaments = async () => {
-            try {
-                const response = await axios.get("/tournaments");
-                setTournaments(response.data);
-            } catch (error) {
-                handleError(error);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchTournaments = useCallback( async () => {
+        try {
+            const response = await axios.get(`/tournaments`, {
+                params: {
+                    page: currentPage,
+                    per_page: tournamentsPerPage
+                }
+            });
+            setTournaments(response.data.tournaments);
+            setTotalPages(response.data.pages);
+        } catch (error) {
+            handleError(error);
+        } finally {
+            setLoading(false);
+        }
+    }, [currentPage]);
 
+    useEffect(() => {
         fetchTournaments();
-    }, []);
+    }, [fetchTournaments]);
 
     const TournamentItem = React.memo(({ tournament }) => (
         <ListGroup.Item variant="warning" className="d-flex justify-content-between align-items-center">
@@ -59,6 +70,16 @@ const TournamentList = () => {
                     ))}
                 </ListGroup>
             )}
+
+            <CustomPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(page) => {
+                    setCurrentPage(page);
+                    setLoading(true);
+                }}
+            />
+
             <Link to="/tournaments/add">
                 <Button variant="primary" className="mt-3">Добавить турнир</Button>
             </Link>
