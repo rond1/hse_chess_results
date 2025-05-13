@@ -72,7 +72,7 @@ const User = () => {
 
     const deleteUser = useCallback(() => {
         axios.delete(`/users/${id}`)
-            .then(() => navigate("/users"))
+            .then(() => navigate("/users", { replace: true }))
             .catch(error => console.error("Ошибка удаления:", error));
     }, [id, navigate]);
 

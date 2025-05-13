@@ -81,7 +81,7 @@ const Round = () => {
     const deleteRound = () => {
         if (window.confirm("Вы уверены, что хотите удалить тур?")) {
             axios.delete(`/rounds/${roundId}`, { data: { salt: salt } })
-                .then(() => navigate(`/categories/${round?.category_id}`, { state: { refresh: true } }))
+                .then(() => navigate(`/categories/${round?.category_id}`, { state: { refresh: true }, replace: true}))
                 .catch(error => console.error("Ошибка удаления тура:", error));
         }
     };

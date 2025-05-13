@@ -6,11 +6,15 @@ const MovesModal = ({ show, onHide, moves }) => (
         <Modal.Header closeButton>
             <Modal.Title>Ходы партии</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-            <pre>{moves}</pre>
+        <Modal.Body style={{ overflowX: "auto" }}>
+            <pre style={{
+                whiteSpace: "pre-wrap",
+            }}>
+                {moves}
+            </pre>
         </Modal.Body>
         <Modal.Footer>
-            <Button variant="secondary" onClick={onHide}>
+            <Button variant="outline-warning" onClick={onHide}>
                 Закрыть
             </Button>
         </Modal.Footer>

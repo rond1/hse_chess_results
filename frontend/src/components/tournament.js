@@ -66,7 +66,7 @@ const Tournament = () => {
                 `/tournaments/${tournamentId}`,
                 { data: { creator_id, salt: salt } }
             )
-                .then(() => navigate("/tournaments"))
+                .then(() => navigate("/tournaments", { replace: true }))
                 .catch(error => console.error("Ошибка удаления турнира:", error));
         }
     };

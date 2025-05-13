@@ -64,7 +64,7 @@ const Category = () => {
             axios.delete(`/categories/${categoryId}`, {
                 data: { salt: salt }
             })
-                .then(() => navigate(`/tournaments/${category?.tournament_id}`))
+                .then(() => navigate(`/tournaments/${category?.tournament_id}`, { replace: true }))
                 .catch(error => console.error("Ошибка удаления категории:", error));
         }
     };

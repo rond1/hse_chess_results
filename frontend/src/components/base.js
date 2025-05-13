@@ -20,7 +20,7 @@ const Base = () => {
             axios.delete(`/users/${user.id}`)
                 .then(() => {
                     logout();
-                    navigate("/register");
+                    navigate("/register", { replace: true });
                 })
                 .catch(error => console.error("Ошибка удаления:", error));
         }
