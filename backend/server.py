@@ -9,7 +9,7 @@ from flask_cors import CORS
 from flask_jwt_extended import create_access_token, JWTManager, jwt_required, get_jwt_identity
 from flask_wtf.csrf import CSRFProtect
 
-from data.__all_models import *
+from data.__all_models import User
 from data import user_resources, tournament_resources, category_resources, round_resources, game_resources, pgn_resources
 from forms.login import LoginForm
 from forms.user import RegisterForm
@@ -150,22 +150,6 @@ def main():
         user.faculty = 'cs'
         user.degree = '15'
         db_sess.add(user)
-    if not db_sess.query(Tournament).all():
-        new_tournament = Tournament(
-            id = 1,
-            name="Тестовый турнир",
-            game_time=60,
-            start=datetime.now(),
-            creator_id=1,
-            is_finished=False
-        )
-        db_sess.add(new_tournament)
-    if not db_sess.query(Category).all():
-        category = Category()
-        category.name = 'Пробная категория'
-        category.tournament_id = 1
-        category.id = 1
-        db_sess.add(category)
     db_sess.commit()
 
     # для списка

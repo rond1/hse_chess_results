@@ -22,7 +22,6 @@ class PGNUploadResource(Resource):
 
         file = request.files['file']
         pgn_text = file.read().decode('utf-8')
-        print("PGN (начало):", pgn_text[:500])
         pgn_io = io.StringIO(pgn_text)
 
         session = db_session.create_session()
@@ -41,6 +40,9 @@ class PGNUploadResource(Resource):
             white = game.headers["White"]
             black = game.headers["Black"]
             result = game.headers["Result"]
+
+            if result == '1/2-1/2':
+                result = '½-½'
 
             moves_san = []
             node = game
