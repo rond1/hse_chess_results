@@ -7,6 +7,7 @@ from data import db_session
 from .__all_models import Tournament
 from salt import salt
 from forms.tournament import TournamentPostForm
+from extensions import cache
 
 def abort_if_tournaments_not_found(tournament_id):
     session = db_session.create_session()
@@ -16,21 +17,35 @@ def abort_if_tournaments_not_found(tournament_id):
 
 
 class TournamentListResource(Resource):
+    @staticmethod
+    @cache.memoize(timeout=3600)
+    def get_finished_tournaments():
+        session = db_session.create_session()
+        query = session.query(Tournament).filter(Tournament.is_finished == True)
+        query = query.order_by(Tournament.start.desc())
+
+        tournaments = query.all()
+        return tournaments
+
     def get(self):
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 10, type=int)
 
-        session = db_session.create_session()
-        query = session.query(Tournament)
-        query = query.order_by(Tournament.is_finished, Tournament.start.desc())
+        finished_tournaments = self.get_finished_tournaments()
 
-        total = query.count()
+        session = db_session.create_session()
+        query = session.query(Tournament).filter(Tournament.is_finished == False)
+        query = query.order_by(Tournament.start.desc())
+
         tournaments = query.offset((page - 1) * per_page).limit(per_page).all()
+        total = query.count() + len(finished_tournaments)
+
+        combined_tournaments = tournaments + finished_tournaments
 
         return {
             'tournaments': [
                 tournament.to_dict(only=('id', 'name', 'game_time', 'move_time', 'start', 'is_finished', 'creator_id'))
-                for tournament in tournaments
+                for tournament in combined_tournaments
             ],
             'total': total,
             'page': page,
@@ -90,6 +105,9 @@ class TournamentResource(Resource):
         if 'is_finished' in data and len(data.keys()) <= 3:
             tournament.is_finished = data['is_finished']
             session.commit()
+
+            cache.delete_memoized(TournamentListResource.get_finished_tournaments)
+
             return {'success': 'OK'}
 
         try:
@@ -103,6 +121,8 @@ class TournamentResource(Resource):
         tournament.start = start
         tournament.creator_id = data.get('creator_id')
         session.commit()
+
+        cache.delete_memoized(TournamentListResource.get_finished_tournaments)
 
         return {'success': 'OK'}
 
@@ -118,4 +138,7 @@ class TournamentResource(Resource):
         tournament = session.query(Tournament).get(tournament_id)
         session.delete(tournament)
         session.commit()
+
+        cache.delete_memoized(TournamentListResource.get_finished_tournaments)
+
         return {'success': 'OK'}

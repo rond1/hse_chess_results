@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 import os
+from extensions import cache
 
 from datetime import datetime
 from flask import Flask, request, jsonify
@@ -21,6 +22,8 @@ load_dotenv()
 app = Flask(__name__)
 api = Api(app)
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 password = os.getenv("DB_PASSWORD")
 jwt_secret = os.getenv("JWT_SECRET_KEY")
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -31,6 +34,11 @@ app.config['WTF_CSRF_ENABLED'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://root:{password}@localhost/hse_chess_results'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+cache.init_app(app, config={
+    'CACHE_TYPE': 'FileSystemCache',
+    'CACHE_DIR': os.path.join(BASE_DIR, 'cache'),
+    'CACHE_DEFAULT_TIMEOUT': 3600
+})
 jwt = JWTManager(app)
 csrf = CSRFProtect()
 csrf.init_app(app)
