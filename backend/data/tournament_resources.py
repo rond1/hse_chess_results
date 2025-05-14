@@ -13,7 +13,7 @@ def abort_if_tournaments_not_found(tournament_id):
     session = db_session.create_session()
     tournament = session.query(Tournament).get(tournament_id)
     if not tournament:
-        abort(404, message=f"Tournament {tournament_id} not found")
+        abort(404, message=f"Турнир {tournament_id} не найден")
 
 
 class TournamentListResource(Resource):
@@ -65,7 +65,7 @@ class TournamentListResource(Resource):
             try:
                 start = datetime.datetime.strptime(data['start'], '%Y-%m-%dT%H:%M')
             except (KeyError, ValueError):
-                return {'error': 'Invalid datetime format'}, 400
+                return {'error': 'Неверный формат даты'}, 400
 
             session = db_session.create_session()
             tournament = Tournament(
@@ -113,7 +113,7 @@ class TournamentResource(Resource):
         try:
             start = datetime.datetime.strptime(data['start'], '%Y-%m-%dT%H:%M')
         except (KeyError, ValueError):
-            return {'error': 'Invalid datetime format'}, 400
+            return {'error': 'Неверный формат даты'}, 400
 
         tournament.name = data.get('name')
         tournament.game_time = data.get('game_time')

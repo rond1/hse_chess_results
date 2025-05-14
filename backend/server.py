@@ -83,15 +83,12 @@ def load_user(user_id):
 @jwt_required()
 def get_user():
     user_id = get_jwt_identity()
-    print(f"User ID из токена: {user_id}")
 
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(int(user_id))
     if user:
-        print(f"Найден пользователь: {user.fio}")
         return jsonify({"fio": user.fio, "is_admin": user.is_admin, "id": user_id}), 200
-    print("Пользователь не найден")
-    return jsonify({"error": "User not found"}), 404
+    return jsonify({"error": "Пользователь не найден"}), 404
 
 
 
@@ -126,6 +123,8 @@ def login():
     if form.validate():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == form.email.data).first()
+        if not user:
+            return jsonify({"errors": {"email": "Пользователь не зарегистрирован"}}), 400
         if user and user.check_password(form.password.data):
             if not user.is_activated and not user.is_admin:
                 return jsonify({"errors": {"email": "Пользователь не активирован"}}), 400
@@ -144,7 +143,6 @@ def main():
     try:
         db_session.global_init(username="root", password=password, host="localhost", port=3306, db_name="hse_chess_results")
     except Exception as e:
-        print(f"Ошибка подключения к базе данных: {e}")
         exit(1)
     db_sess = db_session.create_session()
     if not db_sess.query(User).all():

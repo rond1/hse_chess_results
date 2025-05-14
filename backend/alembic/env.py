@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 import sys
 from logging.config import fileConfig
 
@@ -12,7 +13,12 @@ from data.db_session import SqlAlchemyBase
 from data.__all_models import *
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
+load_dotenv()
+db_url = f'mysql+pymysql://root:{os.getenv("DB_PASSWORD")}@localhost/hse_chess_results'
+if db_url is None:
+    raise Exception("db_url not set in environment")
 config = context.config
+config.set_main_option("sqlalchemy.url", db_url)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -43,9 +49,8 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
     context.configure(
-        url=url,
+        url=db_url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},

@@ -10,7 +10,7 @@ def abort_if_categories_not_found(category_id):
     session = db_session.create_session()
     category = session.query(Category).get(category_id)
     if not category:
-        abort(404, message=f"Category {category_id} not found")
+        abort(404, message=f"Категория {category_id} не найдена")
 
 
 class CategoryListResource(Resource):
@@ -34,7 +34,7 @@ class CategoryListResource(Resource):
             return {'error': 'unsalted'}, 400
 
         if not data.get('name'):
-            return {'error': 'Invalid name'}, 400
+            return {'error': 'Нет имени'}, 400
 
         if 'name' in data and data['name'] and 'tournament_id' in data and data['tournament_id']:
             session = db_session.create_session()

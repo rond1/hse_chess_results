@@ -13,7 +13,7 @@ def abort_if_round_not_found(round_id):
     session = db_session.create_session()
     round = session.query(Round).get(round_id)
     if not round:
-        abort(404, message=f"Round {round_id} not found")
+        abort(404, message=f"Тур {round_id} не найден")
 
 
 class RoundListResource(Resource):
@@ -37,12 +37,12 @@ class RoundListResource(Resource):
             return {'error': 'unsalted'}, 400
 
         if not data.get('name') or not data.get('category_id') or not data.get('date'):
-            return {'error': 'Invalid data'}, 400
+            return {'error': 'Недопустимые данные'}, 400
 
         try:
             date = datetime.datetime.strptime(data['date'], '%Y-%m-%dT%H:%M')
         except (KeyError, ValueError):
-            return {'error': 'Invalid datetime format'}, 400
+            return {'error': 'Неверный формат даты'}, 400
 
         session = db_session.create_session()
         round = Round(
@@ -76,7 +76,7 @@ class RoundResource(Resource):
         try:
             date = datetime.datetime.strptime(data['date'], '%Y-%m-%dT%H:%M')
         except (KeyError, ValueError):
-            return {'error': 'Invalid datetime format'}, 400
+            return {'error': 'Неверный формат даты'}, 400
 
         round.name = data.get('name')
         round.date = date

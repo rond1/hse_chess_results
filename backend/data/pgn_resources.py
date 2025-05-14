@@ -31,7 +31,6 @@ class PGNUploadResource(Resource):
             try:
                 game = chess.pgn.read_game(pgn_io)
             except Exception as e:
-                print("Ошибка парсинга PGN:", str(e))
                 return {'error': 'Некорректный формат PGN'}, 400
 
             if game is None:
